@@ -80,8 +80,8 @@ public class UserInfoController {
      */
     @ResponseBody		//通过HttpConverterMessage进行消息转换。
     @RequestMapping("/requestLogin")
-    public Object login(String phone, String code,HttpServletRequest request, HttpServletResponse response) {
-         return userInfoService.login(phone,code,request,response);
+    public Object login(String phone, String code,String appId,String deviceId,String latitude,String longitude) {
+         return userInfoService.login(phone, code,appId,deviceId,latitude,longitude);
     }
 
 

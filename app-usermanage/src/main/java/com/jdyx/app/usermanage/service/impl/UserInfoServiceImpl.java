@@ -9,10 +9,6 @@ import com.jdyx.app.util.SmsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -94,9 +90,10 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @return
      */
     @Override
-    public Object login(String phone, String code, HttpServletRequest request, HttpServletResponse response) {
+    public Object login(String phone, String code,String appId,String deviceId,String latitude,String longitude) {
         Map<String, Object> result = new HashMap<String, Object>();
-        if (phone == null || code == null  || phone.trim().length()<11 || phone.trim().length()>11){
+        //排格式
+        if (phone == null || code == null  || phone.trim().length()<11 || phone.trim().length()>11) {
             //判断手机号是否是数字
             for (int i = 0; i < phone.length(); i++) {
                 if (!Character.isDigit(phone.charAt(i))) {
@@ -105,65 +102,54 @@ public class UserInfoServiceImpl implements UserInfoService {
                     return result;
                 }
             }
-            //去缓存比对验证码
-            Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
-            String key = Const.PHONE_PREFIX + phone + Const.PHONE_SUFFIX;
-            String server_key = jedis.get(key);
-            jedis.close();
-            //比对
-            if(!code.equals(server_key)) {
-                //异常
-                result.put("error", Const.LOGIN_CODE_TIMEOUT);   //验证码错误或超时
-                result.put("success","false");
-                return result;
-            }else{
-                //通过 在到数据库去查
-                UserInfo userInfo = new UserInfo();
-                userInfo.setPhone(phone);
-                //区分是老用户还是新注册用户
-                UserInfo user = getUserByPhone(userInfo);
-                if(user == null) {
-                    //新用户 注册账号
-                    Date date = new Date();
-                    userInfo.setId(null);
-                    userInfo.setCreateDate(date);
-                    userInfo.setAccountType(0);
-                    userInfo.setIsEnable("0");
-                    userInfo.setIsCertification("0");
-                    userInfo.setIsNotice("0");
-                    userInfo.setIsDisturb("0");
-                    userInfo.setCurrentStatus("0");
-                    userInfo.setFree(0);
-                    BigDecimal balance = new BigDecimal(0);
-                    userInfo.setBalance(balance);
-                    userInfo.setCreateDate(date);
-                    if (createUser(userInfo)>0){
-                        //注册成功
-                        result.put("message","注册成功");
-                        result.put("success", true);
-                    }else{
-                        //注册失败
-                        result.put("message","注册失败");
-                        result.put("success", false);
-                        return  result;
-                    }
-
-                }
-                //登录操作
-                Integer userId = user.getId();
-                Cookie phone_id = new Cookie("id", userId.toString());
-                Cookie phone_no = new Cookie("phone", user.getPhone());
-                String token = UUID.randomUUID().toString().replaceAll("-","");
-                Cookie phone_token = new Cookie("token",token);
-                response.addCookie(phone_id);
-            }
-
-
-
-        }else{  //没登录过
-            //验证
-
         }
+        //去缓存比对验证码
+        Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
+        String key = Const.PHONE_PREFIX + phone + Const.PHONE_SUFFIX;
+        String server_key = jedis.get(key);
+        jedis.close();
+        //比对
+        if(!code.equals(server_key)) {
+            //异常
+            result.put("error", Const.LOGIN_CODE_TIMEOUT);   //验证码错误或超时
+            result.put("success","false");
+            return result;
+        }
+        //通过 在到数据库去查
+        UserInfo userInfo = new UserInfo();
+        userInfo.setPhone(phone);
+        //区分是老用户还是新注册用户
+        UserInfo user = getUserByPhone(userInfo);
+        //新用户注册
+        if(user == null) {
+            Date date = new Date();
+            userInfo.setId(null);
+            userInfo.setCreateDate(date);
+            userInfo.setAccountType(0);
+            userInfo.setIsEnable("0");
+            userInfo.setIsCertification("0");
+            userInfo.setIsNotice("0");
+            userInfo.setIsDisturb("0");
+            userInfo.setCurrentStatus("0");
+            userInfo.setFree(0);
+            BigDecimal balance = new BigDecimal(0);
+            userInfo.setBalance(balance);
+            userInfo.setCreateDate(date);
+            userInfo.setAppId(appId);
+            userInfo.setDeviceId(deviceId);
+            if (createUser(userInfo)<=0){
+                //注册失败
+                result.put("message","注册失败");
+                result.put("success", false);
+                return  result;
+            }
+        }
+        //新老用户登录操作
+        //1.制作令牌
+        //Integer userId = user.getId();
+        System.out.println(userInfo);
+        String token = UUID.randomUUID().toString().replaceAll("-","");
+        //2.拼接
         return result;
     }
 }

@@ -1,5 +1,6 @@
 package com.jdyx.app.usermanage;
 
+import com.jdyx.app.bean.UserInfo;
 import com.jdyx.app.usermanage.mapper.UserInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

@@ -1,15 +1,23 @@
 package com.jdyx.app.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
+
+import java.io.Serializable;
+
 /**
  * 描述:app_version表的实体类
  * @version
  * @author:  Administrator
  * @创建时间: 2019-01-03
  */
-public class AppVersion {
+@Data
+public class AppVersion implements Serializable {
     /**
      * 编号
      */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
