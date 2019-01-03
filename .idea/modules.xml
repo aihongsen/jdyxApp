@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/app-bean/app-bean.iml" filepath="$PROJECT_DIR$/app-bean/app-bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-common-util/app-common-util.iml" filepath="$PROJECT_DIR$/app-common-util/app-common-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-interface/app-interface.iml" filepath="$PROJECT_DIR$/app-interface/app-interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-parent/app-parent.iml" filepath="$PROJECT_DIR$/app-parent/app-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-service-util/app-service-util.iml" filepath="$PROJECT_DIR$/app-service-util/app-service-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-usermanage/app-usermanage.iml" filepath="$PROJECT_DIR$/app-usermanage/app-usermanage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app-web-util/app-web-util.iml" filepath="$PROJECT_DIR$/app-web-util/app-web-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jdyxApp.iml" filepath="$PROJECT_DIR$/jdyxApp.iml" />
+    </modules>
+  </component>
+</project>
