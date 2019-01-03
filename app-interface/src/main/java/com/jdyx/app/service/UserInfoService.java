@@ -1,7 +1,8 @@
 package com.jdyx.app.service;
 
 import com.jdyx.app.bean.UserInfo;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface UserInfoService {
@@ -38,5 +39,5 @@ public interface UserInfoService {
      * @param code
      * @return
      */
-    public Object login(String phone, String code);
+    public Object login(String phone, String code,HttpServletRequest request,HttpServletResponse response );
 }

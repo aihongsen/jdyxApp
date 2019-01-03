@@ -1,8 +1,6 @@
 package com.jdyx.app.usermanage.service.impl;
 
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.HttpRequest;
-import com.aliyuncs.http.HttpResponse;
 import com.jdyx.app.bean.UserInfo;
 import com.jdyx.app.service.UserInfoService;
 import com.jdyx.app.usermanage.mapper.UserInfoMapper;
@@ -13,6 +11,8 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -25,11 +25,25 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public List<UserInfo> findAll() {
         BigDecimal bigDecimal = new BigDecimal(100);
-        System.out.println(bigDecimal.getClass());
         return userInfoMapper.selectList(null);
 
     }
 
+    @Override
+    public UserInfo getUserByPhone(UserInfo userInfo) {
+        return userInfoMapper.getUserByPhone(userInfo);
+    }
+
+    @Override
+    public Integer createUser(UserInfo userInfo) {
+        return userInfoMapper.insert(userInfo);
+    }
+
+    /**
+     * 请求验证码
+     * @param phone
+     * @return
+     */
     @Override
     public Object requestVerification(String phone) {
         Map<String,Object> result = new HashMap<String,Object>();
@@ -73,16 +87,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         return result;
     }
 
-    @Override
-    public UserInfo getUserByPhone(UserInfo userInfo) {
-        return userInfoMapper.getUserByPhone(userInfo);
-    }
-
-    @Override
-    public Integer createUser(UserInfo userInfo) {
-        return userInfoMapper.insert(userInfo);
-    }
-
     /**
      * 登录
      * @param phone
@@ -90,41 +94,37 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @return
      */
     @Override
-    public Object login(String phone, String code) {
-        Map<String,Object> result = new HashMap<String,Object>();
-        String trim_phone = phone.trim();
-        String trim_code = code.trim();
-        //1.判断手机号格式
-        if(trim_phone.length()<11 || trim_phone.length()>11||phone.length()<11||phone.length()>11 ||phone == null || phone == "") {
-            result.put("error", Const.LOGIN_CODE_ERROR);   //输入的格式错误
-            return result;
-        }else {
-            //1.1判断是否是有效的数字
+    public Object login(String phone, String code, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (phone == null || code == null  || phone.trim().length()<11 || phone.trim().length()>11){
+            //判断手机号是否是数字
             for (int i = 0; i < phone.length(); i++) {
-                if(!Character.isDigit(phone.charAt(i))) {
-                    result.put("error",Const.LOGIN_CODE_ERROR);   //输入的格式错误
+                if (!Character.isDigit(phone.charAt(i))) {
+                    result.put("success", "false");
+                    result.put("error", Const.LOGIN_CODE_ERROR);   //输入的格式错误
                     return result;
                 }
             }
-            //★先查缓存数据
+            //去缓存比对验证码
             Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
-            //拼接字符串
-            String key = Const.PHONE_PREFIX+phone+Const.PHONE_SUFFIX;
+            String key = Const.PHONE_PREFIX + phone + Const.PHONE_SUFFIX;
             String server_key = jedis.get(key);
-            //关闭jedis
             jedis.close();
-            //验证
-            if(!code.equals(server_key)){
-                //验证未通过
+            //比对
+            if(!code.equals(server_key)) {
+                //异常
                 result.put("error", Const.LOGIN_CODE_TIMEOUT);   //验证码错误或超时
-            }else {
-                //验证码通过，在验证数据库里是否有这个手机号
+                result.put("success","false");
+                return result;
+            }else{
+                //通过 在到数据库去查
                 UserInfo userInfo = new UserInfo();
                 userInfo.setPhone(phone);
-                //判断用户是注册还是登陆
-                if (getUserByPhone(userInfo) == null){
+                //区分是老用户还是新注册用户
+                UserInfo user = getUserByPhone(userInfo);
+                if(user == null) {
+                    //新用户 注册账号
                     Date date = new Date();
-                    //注册用户
                     userInfo.setId(null);
                     userInfo.setCreateDate(date);
                     userInfo.setAccountType(0);
@@ -133,13 +133,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userInfo.setIsNotice("0");
                     userInfo.setIsDisturb("0");
                     userInfo.setCurrentStatus("0");
-
                     userInfo.setFree(0);
                     BigDecimal balance = new BigDecimal(0);
                     userInfo.setBalance(balance);
-
                     userInfo.setCreateDate(date);
-
                     if (createUser(userInfo)>0){
                         //注册成功
                         result.put("message","注册成功");
@@ -152,39 +149,21 @@ public class UserInfoServiceImpl implements UserInfoService {
                     }
 
                 }
-                //用户登陆
-                //信息添加到cookie中
-                Cookie userId = new Cookie("user_id", "1");
-                // 1.制证
+                //登录操作
+                Integer userId = user.getId();
+                Cookie phone_id = new Cookie("id", userId.toString());
+                Cookie phone_no = new Cookie("phone", user.getPhone());
                 String token = UUID.randomUUID().toString().replaceAll("-","");
-                //保存到redis中
-
-
-                //有cookie的情况下
-                //在检查cookie的合法性和时效性
-
-                //2.交给这个人
-
-
-                result.put("success", true);
-                //在验证数据库里是否有这个手机号
-                //userService.query();
+                Cookie phone_token = new Cookie("token",token);
+                response.addCookie(phone_id);
             }
-            //2.通过验证调用服务查询 手机号是否存在
-            try {
-                //创建一个map给业务层传参使用
-                Map<String,Object> paramMap = new HashMap<String,Object>();
-                paramMap.put("phone", trim_phone);
-//					UserInfo user= userInfoService.(paramMap);
-                //成功
-                result.put("success", true);
-            } catch (Exception e) {
-                //没有查到则为新注册用户
-                result.put("success",false);
-                result.put("error", Const.LOGIN_PHONE_ERROR);   //当前用户不存在
-            }
-            return result;
+
+
+
+        }else{  //没登录过
+            //验证
+
         }
+        return result;
     }
-
 }
