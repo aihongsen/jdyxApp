@@ -29,16 +29,6 @@ public class PostController {
         log.info("StringJson : {}",json);
         return allPost;
     }
-//
-//    @RequestMapping("/savePost")
-//    @ResponseBody
-//    public String savePost(@RequestParam("name") String name){
-//        Post post = new Post();
-//        post.setName(name);
-//        postService.savePost(post);
-//        log.info("添加岗位的id ：{}",post.getId());
-//        return "OK";
-//    }
 
     @RequestMapping("/savePost")
     @ResponseBody

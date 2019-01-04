@@ -12,11 +12,6 @@ import java.math.BigDecimal;
  */
 @Data
 public class Positioning implements Serializable {
-    /**
-     * 编号
-     */
-    @TableId(type = IdType.AUTO)
-    private Integer id;
 
     /**
      * 用户id

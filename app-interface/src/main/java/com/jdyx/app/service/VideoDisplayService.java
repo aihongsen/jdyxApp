@@ -16,6 +16,9 @@ public interface VideoDisplayService {
      */
     void saveVideoDisplay(VideoDisplay videoDisplay);
 
-
-
+    /**
+     * 获取该用户所有视频
+     * @return
+     */
+    List<VideoDisplay> getAllVideoDisplayById(Integer userId);
 }
