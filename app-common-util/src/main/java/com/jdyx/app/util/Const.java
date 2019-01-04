@@ -16,4 +16,8 @@ public class Const {
 	public static final String LOGIN_CODE_TIMEOUT = "验证码错误或超时";	//验证码错误或超时
 	public static final String LOGIN_CODE_ERROR = "输入的格式错误";	//登录错误提示  输入的格式错误
 	public static final String SSO_COOKIE_NAME = "appsso";	//登录监测域名常量(生产环境根据域名在做修改)
+	public static String APP_REQUEST_URL = "https://a1.easemob.com/1169180327177665/jingdianyixian/users";
+	public static String APP_KEY = "1169180327177665#jingdianyixian";
+	public static String APP_CLIENT_ID = "YXA60TaMwDGoEeiXB--hZWNm8w";
+	public static String APP_CLIENT_SECRET = "YXA6jVWh9I2-Zie2l3gBi29Bp5NxXmo";
 }
