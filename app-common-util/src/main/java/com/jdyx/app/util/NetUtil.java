@@ -1,27 +1,22 @@
 package com.jdyx.app.util;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
-import sun.net.www.http.HttpClient;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,34 +25,28 @@ import java.util.Map;
 public class NetUtil {
     public static void main(String[] args) throws IOException {
         String url="https://a1.easemob.com/1169180327177665/jingdianyixian/users";
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("username", "text1111111");
-        map.put("password", "text1111111");
-        map.put("nickname", "text1111111");
-        String body = send(url, map,"utf-8");
-        System.out.println("交易响应结果：");
-        System.out.println(body);
-
-        System.out.println("-----------------------------------");
-
-        //设置请求体
-//        ArrayList<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-//        parameters.add(new BasicNameValuePair("username","text1111111"));
-//        parameters.add(new BasicNameValuePair("password","text1111111"));
-//        parameters.add(new BasicNameValuePair("nickname","text1111111"));
-//        JSONObject jsonParam = new JSONObject();
-//        jsonParam.put("username","text15801332983");
-//        jsonParam.put("password","text15801332983");
-//        jsonParam.put("nickname","text15801332983");
-//        StringEntity entity = new StringEntity(jsonParam.toString(),"utf-8");
-//        entity.setContentEncoding("UTF-8");
-//        entity.setContentType("application/json");
-//        //添加内容
-//        httpPost.setEntity(new UrlEncodedFormEntity(jsonParam));
-//        //执行 并接受请求参数
-//        CloseableHttpResponse response = httpClient.execute(httpPost);
-//        String html = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-//        System.out.println(html);
+        //测试公司的API接口，将json当做一个字符串传入httppost的请求体
+        String result = null;
+        HttpClient client = HttpClients.createDefault();
+        URIBuilder builder = new URIBuilder();
+        URI uri = null;
+        try {
+            HttpPost post = new HttpPost(url);
+            //设置请求头
+            post.setHeader("Content-Type", "application/json");
+            String body = "{\"username\": \"text2222222\",\"password\": \"text2222222\",\"nickname\": \"text2222222\"}";
+            //设置请求体
+            post.setEntity(new StringEntity(body));
+            //获取返回信息
+            HttpResponse response = client.execute(post);
+            HttpParams params = response.getParams();
+            System.out.println("======================================entity = " + params.toString());
+//            result = response.toString();
+//            System.out.println(response);
+        } catch (Exception e) {
+            System.out.println("接口请求失败"+e.getStackTrace());
+        }
+//        System.out.println(result);
 
 //        //1.拿到httpClient对象
 //        CloseableHttpClient httpClient = HttpClients.createDefault();
