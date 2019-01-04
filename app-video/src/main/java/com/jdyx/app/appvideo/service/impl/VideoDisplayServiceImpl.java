@@ -1,5 +1,6 @@
 package com.jdyx.app.appvideo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jdyx.app.appvideo.mapper.VideoDisplayMapper;
 import com.jdyx.app.bean.VideoDisplay;
 import com.jdyx.app.service.VideoDisplayService;
@@ -21,6 +22,12 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     @Override
     public void saveVideoDisplay(VideoDisplay videoDisplay) {
         videoDisplayMapper.insert(videoDisplay);
+    }
+
+    @Override
+    public List<VideoDisplay> getAllVideoDisplayById(Integer userId) {
+        QueryWrapper<VideoDisplay> queryWrapper = new QueryWrapper<VideoDisplay>().eq("user_id",userId);
+        return videoDisplayMapper.getAllVideoDisplayById(userId);
     }
 
 
