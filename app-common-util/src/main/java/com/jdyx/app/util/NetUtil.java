@@ -1,5 +1,9 @@
 package com.jdyx.app.util;
 
+import com.alibaba.dubbo.common.json.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jdyx.app.vo.HunXinEntities;
+import com.jdyx.app.vo.HunXinRoot;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -15,6 +19,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -38,11 +44,16 @@ public class NetUtil {
             //设置请求体
             post.setEntity(new StringEntity(body));
             //获取返回信息
-            HttpResponse response = client.execute(post);
-            HttpParams params = response.getParams();
-            System.out.println("======================================entity = " + params.toString());
-//            result = response.toString();
-//            System.out.println(response);
+            String str = client.execute(post).toString();
+            System.out.println("======================================= " + str);
+            HunXinRoot root = null;
+            List list = null;
+            ObjectMapper objectMapper=new ObjectMapper();
+            HunXinRoot roots=objectMapper.readValue(str,HunXinRoot.class);
+            list=roots.getEntities();
+            System.out.println("====================");
+            System.out.println("roots = " + roots.toString());
+            System.out.println("====================");
         } catch (Exception e) {
             System.out.println("接口请求失败"+e.getStackTrace());
         }
