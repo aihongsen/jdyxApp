@@ -6,7 +6,7 @@ public class VideoConst {
     public static String SECRET_KEY = "YmarNqrqapJpSuCYEfnOKxSNjEIUNJ42Iy23Ebas";//七牛云账号的SK
     public static String BUCKET_NAME = "default"; //七牛空间名称
     public static String QINIU_ADRESS = "http://v.jdyxqq.com/"; //七牛空间地址开头
-    public static String PICTURE_URL = "http://v.jdyxqq.com/34.png";//水印地址
+    public static String PICTURE_URL = "http://v.jdyxqq.com/jdyx.gif";//水印地址
     public static String PIPELINE = "default";//七牛云转码的队列
 
 }

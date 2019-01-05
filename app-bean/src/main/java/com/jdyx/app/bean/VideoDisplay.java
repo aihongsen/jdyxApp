@@ -68,7 +68,7 @@ public class VideoDisplay implements Serializable{
      * 视频是否删除 默认是0展示、1代表逻辑删除
      */
     @TableLogic
-    private String isDelete;
+    private Integer isDelete=0;
 
     /**
      * 视频发布日期
@@ -78,10 +78,10 @@ public class VideoDisplay implements Serializable{
     /**
      * 是否违规 后台 对短视频可控下线 0正常、1违规
      */
-    private String isViolation = "0";
+    private Integer isViolation = 0;
 
     /**
      * 是否隐藏 个人 对短视频可控隐藏 0不隐藏、1隐藏
      */
-    private String isHidden = "0";
+    private Integer isHidden = 0;
 }

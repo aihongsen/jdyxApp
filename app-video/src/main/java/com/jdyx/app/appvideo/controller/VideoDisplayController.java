@@ -3,7 +3,9 @@ package com.jdyx.app.appvideo.controller;
 import com.alibaba.fastjson.JSON;
 import com.jdyx.app.appvideo.constant.VideoConst;
 import com.jdyx.app.bean.VideoDisplay;
+import com.jdyx.app.bean.VideoDisplayVo;
 import com.jdyx.app.service.VideoDisplayService;
+import com.jdyx.app.util.DistanceUtil;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.processing.OperationManager;
@@ -13,18 +15,17 @@ import com.qiniu.util.StringMap;
 import com.qiniu.util.UrlSafeBase64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -37,53 +38,35 @@ public class VideoDisplayController {
 
     @RequestMapping("/getAllVideoDisplay")
     @ResponseBody
-    public String getAllVideoDisplay(){
-        List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplay();
-        Object o = JSON.toJSON(allVideoDisplay);
-        log.info("objectJSON : {}",o);
-        String json = String.valueOf(JSON.toJSON(allVideoDisplay));
+    public String getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude){
+        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo();
+        for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
+            String distance = DistanceUtil.algorithm(videoDisplayVo.getLongitude().doubleValue(), videoDisplayVo.getLatitude().doubleValue(), longitude.doubleValue(), latitude.doubleValue());
+            videoDisplayVo.setDistance(distance);
+        }
+        String json = JSON.toJSONString(allVideoDisplay);
         log.info("StringJson : {}",json);
         return  json;
     }
 
     @RequestMapping("/getAllVideoDisplayById")
     @ResponseBody
-    public String getAllVideoDisplayById(HttpServletRequest request){
-
-        Map<String,String> userInfo = (Map<String,String>)request.getAttribute("userInfo");
-        int userId;
-        if(userInfo == null){
-            userId = 2;
-            log.info("用户信息错误");
-        }else{
-            userId = Integer.parseInt(userInfo.get("id"));
-            log.info("用户为：{}",userInfo);
-        }
+    public String getAllVideoDisplayById(Integer userId){
         List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
-        log.info("获取该用户所有视频 ： {}",allVideoDisplay);
-        String json = JSON.toJSON(allVideoDisplay).toString();
+        String json = JSON.toJSONString(allVideoDisplay);
+        log.info("获取该用户所有视频 ：{}",json);
         return  json;
     }
 
     /**
      * 保存视频数据
      * @param videoDisplay
-     * @param request
+     * @param userId
      * @return
      */
     @RequestMapping("/saveVideoDisplay")
     @ResponseBody
-    public String saveVideoDisplay(VideoDisplay videoDisplay,String userid,HttpServletRequest request ){
-
-        Map<String,String> userInfo = (Map<String,String>)request.getAttribute("userInfo");
-        String userId ;
-        if(userInfo == null){
-            userId = userid;
-            log.info("用户信息错误");
-        }else{
-            userId = userInfo.get("id");
-            log.info("用户为：{}",userInfo);
-        }
+    public String saveVideoDisplay(VideoDisplay videoDisplay,String userId){
 
         videoDisplay.setVideoDate(new Date());
         videoDisplay.setUserId(Integer.valueOf(userId));
@@ -93,6 +76,7 @@ public class VideoDisplayController {
             //对视频增加水印,生成有水印的视频地址
             String videoWatermarkAddress = produceVoideoWatermark(userId, videoDisplay.getReleaseType(), bucketKey);
             videoDisplay.setVideoWatermarkAddress(videoWatermarkAddress);
+            log.info("视频水印地址：{}",videoWatermarkAddress);
         } catch (IOException e) {
             log.error("对视频增加水印失败 ：{}",e);
         }
@@ -111,6 +95,7 @@ public class VideoDisplayController {
     public String produceVoideoWatermark( String userId,String releaseType,String bucketKey) throws IOException {
         //设置账号的AK,SK
         Auth auth = Auth.create(VideoConst.ACCESS_KEY, VideoConst.SECRET_KEY);
+
         //新建一个OperationManager对象
         Configuration cfg = new Configuration();
         OperationManager operater = new OperationManager(auth,cfg);
@@ -120,7 +105,8 @@ public class VideoDisplayController {
         String pictureurl = UrlSafeBase64.encodeToString(VideoConst.PICTURE_URL);
         //设置转码操作参数
 //        String fops = "avthumb/mp4/s/640x360/vb/1.25m/wmImage/" + pictureurl;
-        String fops = "avthumb/mp4/wmImage/" + pictureurl +"/wmGravity/NorthWest";
+        String fops = "avwatermarks/mp4/wmImage/" + pictureurl
+                +"/wmIgnoreLoop/0/Constant/1/wmGravity/NorthWest";
         //设置转码的队列
         String pipeline = VideoConst.PIPELINE;
 

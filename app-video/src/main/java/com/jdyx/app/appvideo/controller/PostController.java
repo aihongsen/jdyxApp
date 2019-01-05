@@ -21,13 +21,11 @@ public class PostController {
 
     @RequestMapping("/getAllPost")
     @ResponseBody
-    public List<Post> getAllPost(){
+    public String getAllPost(){
         List<Post> allPost = postService.getAllPost();
-        Object o = JSON.toJSON(allPost);
-        log.info("objectJSON : {}",o);
-        String json = String.valueOf(JSON.toJSON(allPost));
+        String json = JSON.toJSONString(allPost);
         log.info("StringJson : {}",json);
-        return allPost;
+        return json;
     }
 
     @RequestMapping("/savePost")
@@ -37,5 +35,11 @@ public class PostController {
         log.info("添加岗位的id ：{}",post.getId());
         return "OK";
     }
-
+    @RequestMapping("/deletePost")
+    @ResponseBody
+    public String deletePost( Post post){
+        postService.savePost(post);
+        log.info("删除岗位的id ：{}",post.getId());
+        return "OK";
+    }
 }
