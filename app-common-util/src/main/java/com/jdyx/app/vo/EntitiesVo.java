@@ -4,7 +4,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class HunXinEntities implements Serializable {
+public class EntitiesVo implements Serializable {
         private String uuid;
 
         private String type;

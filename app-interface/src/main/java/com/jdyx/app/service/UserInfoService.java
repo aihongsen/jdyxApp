@@ -1,11 +1,14 @@
 package com.jdyx.app.service;
-
 import com.jdyx.app.bean.UserInfo;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface UserInfoService {
+    /**
+     * 根据用户ID查找用户信息
+     * @return
+     */
+    public UserInfo getById(Integer id);
+
     /**
      * 查看所有用户信息
      * @return
@@ -39,5 +42,5 @@ public interface UserInfoService {
      * @param code
      * @return
      */
-    public Object login(String phone, String code,HttpServletRequest request,HttpServletResponse response );
+    public Object login(String phone, String code,String deviceId,String latitude,String longitude);
 }

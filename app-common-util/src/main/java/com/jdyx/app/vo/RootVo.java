@@ -4,7 +4,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
 @Data
-public class HunXinRoot implements Serializable {
+public class RootVo implements Serializable {
     private String action;
 
     private String application;
@@ -13,7 +13,7 @@ public class HunXinRoot implements Serializable {
 
     private String uri;
 
-    private List<HunXinEntities> entities;
+    private List<EntitiesVo> entities;
 
     private int timestamp;
 

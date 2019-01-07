@@ -3,12 +3,15 @@ package com.jdyx.app.usermanage.controller;
 import com.jdyx.app.bean.UserInfo;
 import com.jdyx.app.service.UserInfoService;
 import com.jdyx.app.util.Const;
+import com.jdyx.app.util.ObjectUtils;
 import com.jdyx.app.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -25,29 +28,29 @@ public class UserInfoController {
      */
     @ResponseBody
     @RequestMapping("/cc")
-    public String cc(@CookieValue(name=Const.SSO_COOKIE_NAME,required = false) String cookieValue,String token ,HttpServletRequest request, HttpServletResponse response) {
-        //先判断token是否为空
-        if(!StringUtil.isEmpty(token) && cookieValue == null){
-            //只要这个参数有,说明验证登录通过
-            //添加到cookie
-            Cookie cookie = new Cookie(Const.SSO_COOKIE_NAME,token);
-            System.out.println(cookie);
-            //设置cookie限定的路径 "/"代表当前网站的那一层都可以
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        }
-
-        //1.登录过了
-            if(!StringUtil.isEmpty(token)){
-                //验证cookie是否失效
-                //登录成功返回之前的页面
-            }else{
-                //token为空 是第一次访问，则需要返回到登录页面
-//               UserInfo login =  userInfoService.login();
-            }
-            //2.没有登录过则去登录页面
-
-        return "";
+    public String cc() throws Exception {
+        //通过 在到数据库去查
+        UserInfo userInfo = new UserInfo();
+        userInfo.setPhone("1580133293");
+            Date date = new Date();
+            userInfo.setId(null);                //ID
+            userInfo.setCreateDate(date);        //注册日期
+            userInfo.setAccountType(0);          //账号类型
+            userInfo.setIsEnable("0");           //账号是否开启
+            userInfo.setIsCertification("0");    //是否完成实名认证 0未完成
+        String a = UUID.randomUUID().toString().replaceAll("-", "");
+        String token_key = a.substring(0,4) + "15801332983" + a.substring(28,32);
+        Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
+        //保存到redis里
+        String token = "token_info:"+token_key;
+        System.out.println(token);
+//        Map<String, Object> map = ObjectUtils.objectToMap(userInfo);
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("name","肖芳");
+        ObjectUtils.setObject(jedis,token,map);
+        //保存到redis里
+        jedis.close();
+        return token;
     }
 
 
@@ -57,7 +60,6 @@ public class UserInfoController {
     @ResponseBody
     @RequestMapping("/findAll")
     public List<UserInfo> getAll() {
-
         return userInfoService.findAll();
     }
 
@@ -67,7 +69,7 @@ public class UserInfoController {
      * @return result
      */
     @ResponseBody
-    @RequestMapping("/getSmsCode")
+    @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
     public Object  requestVerification(String phone) {
         return userInfoService.requestVerification(phone);
     }
@@ -79,11 +81,49 @@ public class UserInfoController {
      * @return result
      */
     @ResponseBody		//通过HttpConverterMessage进行消息转换。
-    @RequestMapping("/requestLogin")
-    public Object login(String phone, String code,String appId,String deviceId,String latitude,String longitude) {
-         return userInfoService.login(phone, code,appId,deviceId,latitude,longitude);
+    @RequestMapping(value = "/requestLogin",method = RequestMethod.POST)
+    public Object login(String phone, String code,String deviceId,String latitude,String longitude) {
+         return userInfoService.login(phone, code,deviceId,latitude,longitude);
     }
 
+    /**
+     * 个人信息完善资料
+     * @param name 用户姓名
+     * @param image_src  用户头像
+     * @param gender    用户性别
+     * @param birthday 用户生日
+     * @param education 用户学历
+     * @param workYear  用户工作年限
+     * @param expPostId 用户期待岗位[]
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/personalInfo",method = RequestMethod.POST)
+    public Object personalInfo(String token,Integer id,String name,String image_src,String gender,Date birthday,String education,String workYear,String expPostId[]){
+        HashMap<Object, Object> result = new HashMap<>();
+        System.out.println(name.length());
+        //1.获取参数校验
+            //姓名
+            for (int i = 0; i < name.length(); i++) {
+                        if(!(name.charAt(i) >= 0x4E00 && name.charAt(i) <= 0x9FA5)){
+                            //不是中文
+                            System.out.println("您输入的姓名不是中文");
+                            result.put("error","您输入的姓名不是中文");
 
+                        }
+            }
+        //2.判断用户是否存在
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(name);             //姓名
+        userInfo.setGender(gender);         //性别
+        userInfo.setImageSrc(image_src);    //头像
+        userInfo.setBirthday(birthday);     //生日
+        userInfo.setEducation(education);   //学历
+        userInfo.setWorkYear(workYear);     //工作年限          //期望岗位在关联
+        //2.插入数据
+//            userInfoService.insertPersonalInfo(userInfo);
+
+            return result;
+    }
 
 }
