@@ -18,14 +18,17 @@ public class PositioningController {
     @Autowired
     PositioningService positioningService;
 
+    /**
+     * 0芍药居,39.9778107025,116.4361524582
+     1安贞门,39.9769803325,116.4059722424
+     2知春路,39.9764705954,116.3399469852
+     3知春里,39.9763143849,116.3286226988
+     * @param positioning
+     * @return
+     */
     @RequestMapping("/savePositioning")
     @ResponseBody
-    public String savePositioning(Integer userId, String longitude,String latitude){
-
-        Positioning positioning = new Positioning();
-        positioning.setUserId(userId);
-        positioning.setLongitude(new BigDecimal(longitude));
-        positioning.setLatitude(new BigDecimal(latitude));
+    public String savePositioning(Positioning positioning){
         positioningService.savePositioning(positioning);
         return "OK";
     }

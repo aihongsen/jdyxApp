@@ -3,6 +3,7 @@ package com.jdyx.app.appvideo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jdyx.app.appvideo.mapper.VideoDisplayMapper;
 import com.jdyx.app.bean.VideoDisplay;
+import com.jdyx.app.bean.VideoDisplayVo;
 import com.jdyx.app.service.VideoDisplayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,8 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     VideoDisplayMapper videoDisplayMapper;
 
     @Override
-    public List<VideoDisplay> getAllVideoDisplay(){
-        return videoDisplayMapper.selectList(null);
+    public List<VideoDisplayVo> getAllVideoDisplayVo(){
+        return videoDisplayMapper.getAllVideoDisplayVo();
     }
 
     @Override
@@ -27,7 +28,7 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     @Override
     public List<VideoDisplay> getAllVideoDisplayById(Integer userId) {
         QueryWrapper<VideoDisplay> queryWrapper = new QueryWrapper<VideoDisplay>().eq("user_id",userId);
-        return videoDisplayMapper.getAllVideoDisplayById(userId);
+        return videoDisplayMapper.selectList(queryWrapper);
     }
 
 
