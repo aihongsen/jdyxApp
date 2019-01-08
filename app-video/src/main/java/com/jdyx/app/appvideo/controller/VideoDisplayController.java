@@ -54,19 +54,19 @@ public class VideoDisplayController {
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "jobId", value = "岗位id", required = false, dataType = "Integer")
     })
-    public Map<String,String> getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude,Integer jobId){
+    public Object getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude,Integer jobId){
         List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId);
         if(longitude == null || latitude == null ){
             log.info("无定位信息");
-            return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
+            return ResultUtil.successMap(JSON.toJSON(allVideoDisplay));
         }
         for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
             String distance = DistanceUtil.algorithm(videoDisplayVo.getLongitude().doubleValue(), videoDisplayVo.getLatitude().doubleValue(), longitude.doubleValue(), latitude.doubleValue());
             videoDisplayVo.setDistance(distance);
         }
-        String json = JSON.toJSONString(allVideoDisplay);
+        Object json = JSON.toJSON(allVideoDisplay);
         log.info("StringJson : {}",json);
-        return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
+        return ResultUtil.successMap(JSON.toJSON(allVideoDisplay));
     }
 
     @RequestMapping(value = "/getAllVideoDisplayById",method = RequestMethod.POST)
@@ -75,12 +75,12 @@ public class VideoDisplayController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query", name = "userId", value = "用户id", required = true, dataType = "String")
     })
-    public Map<String,String> getAllVideoDisplayById(Integer userId){
+    public Object getAllVideoDisplayById(Integer userId){
         try {
             List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
-            String json = JSON.toJSONString(allVideoDisplay);
+            Object json = JSON.toJSON(allVideoDisplay);
             log.info("获取该用户所有视频 ：{}",json);
-            return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
+            return ResultUtil.successMap(JSON.toJSON(allVideoDisplay));
         }catch (Exception e){
             log.error("",e);
             return ResultUtil.errorMap();
@@ -94,11 +94,11 @@ public class VideoDisplayController {
      */
     @RequestMapping(value = "/saveVideoDisplay",method = RequestMethod.POST)
     @ResponseBody
-    @ApiOperation(value="查看本人视频")
+    @ApiOperation(value="保存视频")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "videoDisplay", value = "自定义视频类", required = true, dataType = "VideoDisplay")
     })
-    public Map<String,String> saveVideoDisplay(@RequestBody VideoDisplay videoDisplay){
+    public Object saveVideoDisplay(@RequestBody VideoDisplay videoDisplay){
         if(videoDisplay ==null){
             return ResultUtil.exceptionMap("403","参数错误");
         }
@@ -126,7 +126,7 @@ public class VideoDisplayController {
      */
     @RequestMapping(value = "/deleteVideoDisplay",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,String> deleteVideoDisplay(Integer videoId){
+    public Object deleteVideoDisplay(Integer videoId){
         try {
             videoDisplayService.deleteVideoDisplay(videoId);
             return ResultUtil.successMap("");
@@ -199,7 +199,7 @@ public class VideoDisplayController {
      */
     @RequestMapping(value = "/likeVideo",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,String> likeVideo(String userId){
+    public Object likeVideo(String userId){
 
         return ResultUtil.successMap(userId);
     }

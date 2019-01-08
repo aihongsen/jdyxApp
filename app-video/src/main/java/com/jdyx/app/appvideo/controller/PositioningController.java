@@ -39,7 +39,7 @@ public class PositioningController {
             @ApiImplicitParam(paramType="query", name = "latitude", value = "经度", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String")
     })
-    public Map<String,String> savePositioning(Integer userId, BigDecimal latitude,BigDecimal longitude){
+    public Object savePositioning(Integer userId, BigDecimal latitude,BigDecimal longitude){
         if(latitude==null||longitude==null){
             return  ResultUtil.exceptionMap("403","没有找到定位信息");
         }
