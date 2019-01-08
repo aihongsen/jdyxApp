@@ -33,10 +33,10 @@ public class PostController {
     @RequestMapping(value = "/getAllPost",method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation("获取所有岗位")
-    public Map<String,String> getAllPost(){
+    public Object getAllPost(){
         try {
             List<Post> allPost = postService.getAllPost();
-            String json = JSON.toJSONString(allPost);
+            Object json = JSON.toJSON(allPost);
             log.info("StringJson : {}",json);
             return ResultUtil.successMap(json);
         }catch (Exception e){
@@ -52,9 +52,9 @@ public class PostController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query", name = "name", value = "岗位名称", required = true, dataType = "String"),
     })
-    public Map<String,String> savePost(String name){
+    public Object savePost(Post post){
         try {
-            Post post = new Post(null, name);
+//            Post post = new Post(null, name);
             postService.savePost(post);
             log.info("添加岗位的id ：{}",post.getId());
             return ResultUtil.successMap("");
@@ -70,7 +70,7 @@ public class PostController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query", name = "id", value = "岗位id", required = true, dataType = "String"),
     })
-    public Map<String,String>  deletePost(Integer id){
+    public Object  deletePost(Integer id){
         try {
             postService.deletePost(id);
             return ResultUtil.successMap("");
