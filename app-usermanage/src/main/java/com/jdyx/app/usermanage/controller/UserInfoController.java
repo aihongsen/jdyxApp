@@ -11,15 +11,18 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import redis.clients.jedis.Jedis;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Controller
 @Api(value = "用户模块")
+@RequestMapping("user")
 public class UserInfoController {
 
     @Autowired
@@ -76,8 +79,11 @@ public class UserInfoController {
     @ResponseBody
     @ApiOperation(value="请求短信验证码(已完成)", notes="根据手机获取验证码")
     @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
-    @ApiImplicitParam(paramType="request", name = "phone", value = "手机号", required = true, dataType = "String")
-    public Object  requestVerification(UserInfo userInfo){
+    @ApiImplicitParams({
+            @ApiImplicitParam( name = "userInfo", value = "用户信息类", required = true, dataType = "UserInfo")
+    })
+
+    public Object requestVerification(@RequestBody UserInfo userInfo){
         return userInfoService.requestVerification(userInfo.getPhone());
     }
 
@@ -97,7 +103,7 @@ public class UserInfoController {
             @ApiImplicitParam(paramType="query", name = "latitude", value = "经度", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String")
     })
-    public Object login(String phone, String code,String deviceId,String latitude,String longitude) {
+    public Object login(String phone, String code, String deviceId, BigDecimal latitude, BigDecimal longitude) {
          return userInfoService.login(phone, code,deviceId,latitude,longitude);
     }
 

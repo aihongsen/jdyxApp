@@ -123,7 +123,7 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @return
      */
     @Override
-    public Object login(String phone, String code,String deviceId,String latitude,String longitude) {
+    public Object login(String phone, String code,String deviceId,BigDecimal latitude,BigDecimal longitude) {
         Map<String, Object> result = new HashMap<String, Object>();
         //排格式
         if (phone == null || code == null  || phone.trim().length()<11 || phone.trim().length()>11) {
