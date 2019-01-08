@@ -16,8 +16,8 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     VideoDisplayMapper videoDisplayMapper;
 
     @Override
-    public List<VideoDisplayVo> getAllVideoDisplayVo(){
-        return videoDisplayMapper.getAllVideoDisplayVo();
+    public List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId){
+        return videoDisplayMapper.getAllVideoDisplayVo(jobId);
     }
 
     @Override
@@ -29,6 +29,11 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     public List<VideoDisplay> getAllVideoDisplayById(Integer userId) {
         QueryWrapper<VideoDisplay> queryWrapper = new QueryWrapper<VideoDisplay>().eq("user_id",userId);
         return videoDisplayMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void deleteVideoDisplay(Integer id) {
+        videoDisplayMapper.delete(new QueryWrapper<VideoDisplay>().eq("id",id));
     }
 
 

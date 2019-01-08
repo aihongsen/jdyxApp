@@ -2,6 +2,7 @@ package com.jdyx.app.appvideo.controller;
 
 import com.jdyx.app.bean.Positioning;
 import com.jdyx.app.service.PositioningService;
+import com.jdyx.app.util.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Slf4j
 @RequestMapping("/positioning")
@@ -28,8 +30,13 @@ public class PositioningController {
      */
     @RequestMapping("/savePositioning")
     @ResponseBody
-    public String savePositioning(Positioning positioning){
-        positioningService.savePositioning(positioning);
-        return "OK";
+    public Map<String,String> savePositioning(Positioning positioning){
+        try {
+            positioningService.savePositioning(positioning);
+            return ResultUtil.successMap("");
+        }catch (Exception e){
+            log.error("",e);
+            return ResultUtil.errorMap();
+        }
     }
 }

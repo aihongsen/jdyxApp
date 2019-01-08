@@ -4,9 +4,14 @@
 
     <select id="getAllVideoDisplayVo" resultType="com.jdyx.app.bean.VideoDisplayVo">
         SELECT vd.`id`,vd.`user_id`,vd.`release_type`,vd.`video_title`,vd.`video_description`,vd.`video_picture`,vd.`video_address`,
-	        vd.`video_watermark_address`,vd.`music_ddress`,vd.`job_id`,vd.`is_delete`,vd.`is_delete`,vd.`video_date`,vd.`is_violation`,vd.`is_hidden`,
-	        pt.`latitude`,pt.`longitude`
+        vd.`video_watermark_address`,vd.`music_ddress`,vd.`job_id`,vd.`is_delete`,vd.`is_delete`,vd.`video_date`,vd.`is_violation`,vd.`is_hidden`,
+        pt.`latitude`,pt.`longitude`
         FROM `video_display` vd
         LEFT JOIN `positioning` pt ON vd.`user_id` = pt.`user_id`
+        WHERE
+        <if test="jobId != null">
+            vd.`job_id`= #{jobId} and
+        </if>
+        vd.`is_delete`=0 AND vd.`is_hidden`=0 AND vd.`is_violation`=0
     </select>
 </mapper>

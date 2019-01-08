@@ -18,9 +18,9 @@ public class ResultUtil {
         return map;
     }
 
-    public static Map<String,String> exceptionMap(String message){
+    public static Map<String,String> exceptionMap(String code,String message){
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put("code","500");
+        map.put("code",code);
         map.put("message",message);
         return map;
     }

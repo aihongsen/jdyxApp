@@ -10,7 +10,7 @@ public interface VideoDisplayService {
      * 获取所有视频
      * @return
      */
-    List<VideoDisplayVo> getAllVideoDisplayVo();
+    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId);
 
     /**
      * 保存视频
@@ -22,4 +22,6 @@ public interface VideoDisplayService {
      * @return
      */
     List<VideoDisplay> getAllVideoDisplayById(Integer userId);
+
+    void deleteVideoDisplay(Integer videoId);
 }

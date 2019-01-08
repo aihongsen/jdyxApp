@@ -10,5 +10,5 @@ import java.util.List;
 @Mapper
 public interface VideoDisplayMapper extends BaseMapper<VideoDisplay> {
 
-    List<VideoDisplayVo> getAllVideoDisplayVo();
+    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId);
 }

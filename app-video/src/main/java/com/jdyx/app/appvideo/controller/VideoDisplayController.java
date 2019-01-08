@@ -6,6 +6,7 @@ import com.jdyx.app.bean.VideoDisplay;
 import com.jdyx.app.bean.VideoDisplayVo;
 import com.jdyx.app.service.VideoDisplayService;
 import com.jdyx.app.util.DistanceUtil;
+import com.jdyx.app.util.ResultUtil;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.processing.OperationManager;
@@ -16,17 +17,15 @@ import com.qiniu.util.UrlSafeBase64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @RequestMapping("/video")
@@ -36,52 +35,85 @@ public class VideoDisplayController {
     @Autowired
     VideoDisplayService videoDisplayService;
 
+    /**
+     *
+     * @param longitude
+     * @param latitude
+     * @return
+     */
     @RequestMapping("/getAllVideoDisplay")
     @ResponseBody
-    public String getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude){
-        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo();
+    public Map<String,String> getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude,Integer jobId){
+        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId);
+        if(longitude == null || latitude == null ){
+            log.info("无定位信息");
+            return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
+        }
         for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
             String distance = DistanceUtil.algorithm(videoDisplayVo.getLongitude().doubleValue(), videoDisplayVo.getLatitude().doubleValue(), longitude.doubleValue(), latitude.doubleValue());
             videoDisplayVo.setDistance(distance);
         }
         String json = JSON.toJSONString(allVideoDisplay);
         log.info("StringJson : {}",json);
-        return  json;
+        return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
     }
 
     @RequestMapping("/getAllVideoDisplayById")
     @ResponseBody
-    public String getAllVideoDisplayById(Integer userId){
-        List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
-        String json = JSON.toJSONString(allVideoDisplay);
-        log.info("获取该用户所有视频 ：{}",json);
-        return  json;
+    public Map<String,String> getAllVideoDisplayById(Integer userId){
+        try {
+            List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
+            String json = JSON.toJSONString(allVideoDisplay);
+            log.info("获取该用户所有视频 ：{}",json);
+            return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
+        }catch (Exception e){
+            log.error("",e);
+            return ResultUtil.errorMap();
+        }
     }
 
     /**
      * 保存视频数据
      * @param videoDisplay
-     * @param userId
      * @return
      */
     @RequestMapping("/saveVideoDisplay")
     @ResponseBody
-    public String saveVideoDisplay(VideoDisplay videoDisplay,String userId){
-
+    public Map<String,String> saveVideoDisplay(VideoDisplay videoDisplay){
+        if(videoDisplay ==null){
+            return ResultUtil.exceptionMap("1","数据错误");
+        }
         videoDisplay.setVideoDate(new Date());
-        videoDisplay.setUserId(Integer.valueOf(userId));
+        videoDisplay.setUserId(videoDisplay.getUserId());
         //根据地址获取视频文件名
         String bucketKey = videoDisplay.getVideoAddress().replace(VideoConst.QINIU_ADRESS, "");
         try {
             //对视频增加水印,生成有水印的视频地址
-            String videoWatermarkAddress = produceVoideoWatermark(userId, videoDisplay.getReleaseType(), bucketKey);
+            String videoWatermarkAddress = produceVoideoWatermark(videoDisplay.getUserId(), videoDisplay.getReleaseType(), bucketKey);
             videoDisplay.setVideoWatermarkAddress(videoWatermarkAddress);
             log.info("视频水印地址：{}",videoWatermarkAddress);
+            videoDisplayService.saveVideoDisplay(videoDisplay);
+            return ResultUtil.successMap("");
         } catch (IOException e) {
             log.error("对视频增加水印失败 ：{}",e);
+            return ResultUtil.errorMap();
         }
-        videoDisplayService.saveVideoDisplay(videoDisplay);
-        return "OK";
+    }
+
+    /**
+     * 逻辑删除视频
+     * @param videoId
+     * @return
+     */
+    @RequestMapping("/deleteVideoDisplay")
+    @ResponseBody
+    public Map<String,String> deleteVideoDisplay(Integer videoId){
+        try {
+            videoDisplayService.deleteVideoDisplay(videoId);
+            return ResultUtil.successMap("");
+        }catch (Exception e){
+            return ResultUtil.errorMap();
+        }
     }
 
     /**
@@ -92,7 +124,7 @@ public class VideoDisplayController {
      * @return  新视频地址
      * @throws IOException
      */
-    public String produceVoideoWatermark( String userId,String releaseType,String bucketKey) throws IOException {
+    public String produceVoideoWatermark(Integer userId,String releaseType,String bucketKey) throws IOException {
         //设置账号的AK,SK
         Auth auth = Auth.create(VideoConst.ACCESS_KEY, VideoConst.SECRET_KEY);
 
@@ -134,10 +166,23 @@ public class VideoDisplayController {
                 log.info("响应的文本信息 :{}",r.bodyString());
             } catch (QiniuException e1) {
                 //ignore
+                log.info("",e1);
             }
             return "";
         }
     }
 
+    /**
+     * 视频点赞
+     * @param userId
+     * @param response
+     * @return
+     */
+    @RequestMapping("/likeVideo")
+    @ResponseBody
+    public Map<String,String> likeVideo(String userId, HttpServletResponse response){
+
+        return ResultUtil.successMap(userId);
+    }
 
 }
