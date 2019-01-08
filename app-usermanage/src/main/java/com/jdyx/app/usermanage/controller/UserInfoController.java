@@ -70,7 +70,7 @@ public class UserInfoController {
 
     /**
      * 请求短信验证码
-     * @param phone
+     * @param userInfo
      * @return result
      */
     @ResponseBody
