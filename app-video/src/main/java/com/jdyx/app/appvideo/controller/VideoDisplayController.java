@@ -14,10 +14,15 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import com.qiniu.util.UrlSafeBase64;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,8 +46,14 @@ public class VideoDisplayController {
      * @param latitude
      * @return
      */
-    @RequestMapping("/getAllVideoDisplay")
+    @RequestMapping(value = "/getAllVideoDisplay",method = RequestMethod.POST)
     @ResponseBody
+    @ApiOperation(value="查看所有视频")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "latitude", value = "经度", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "jobId", value = "岗位id", required = false, dataType = "Integer")
+    })
     public Map<String,String> getAllVideoDisplay(BigDecimal longitude, BigDecimal latitude,Integer jobId){
         List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId);
         if(longitude == null || latitude == null ){
@@ -58,8 +69,12 @@ public class VideoDisplayController {
         return ResultUtil.successMap(JSON.toJSONString(allVideoDisplay));
     }
 
-    @RequestMapping("/getAllVideoDisplayById")
+    @RequestMapping(value = "/getAllVideoDisplayById",method = RequestMethod.POST)
     @ResponseBody
+    @ApiOperation(value="查看本人视频")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "userId", value = "用户id", required = true, dataType = "String")
+    })
     public Map<String,String> getAllVideoDisplayById(Integer userId){
         try {
             List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
@@ -77,11 +92,15 @@ public class VideoDisplayController {
      * @param videoDisplay
      * @return
      */
-    @RequestMapping("/saveVideoDisplay")
+    @RequestMapping(value = "/saveVideoDisplay",method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,String> saveVideoDisplay(VideoDisplay videoDisplay){
+    @ApiOperation(value="查看本人视频")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "videoDisplay", value = "自定义视频类", required = true, dataType = "VideoDisplay")
+    })
+    public Map<String,String> saveVideoDisplay(@RequestBody VideoDisplay videoDisplay){
         if(videoDisplay ==null){
-            return ResultUtil.exceptionMap("1","数据错误");
+            return ResultUtil.exceptionMap("403","参数错误");
         }
         videoDisplay.setVideoDate(new Date());
         videoDisplay.setUserId(videoDisplay.getUserId());
@@ -105,7 +124,7 @@ public class VideoDisplayController {
      * @param videoId
      * @return
      */
-    @RequestMapping("/deleteVideoDisplay")
+    @RequestMapping(value = "/deleteVideoDisplay",method = RequestMethod.GET)
     @ResponseBody
     public Map<String,String> deleteVideoDisplay(Integer videoId){
         try {
@@ -178,9 +197,9 @@ public class VideoDisplayController {
      * @param response
      * @return
      */
-    @RequestMapping("/likeVideo")
+    @RequestMapping(value = "/likeVideo",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,String> likeVideo(String userId, HttpServletResponse response){
+    public Map<String,String> likeVideo(String userId){
 
         return ResultUtil.successMap(userId);
     }

@@ -22,4 +22,6 @@ public interface VideoDisplayService {
      * @return
      */
     List<VideoDisplay> getAllVideoDisplayById(Integer userId);
+
+    void deleteVideoDisplay(Integer videoId);
 }

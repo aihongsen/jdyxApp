@@ -8,4 +8,6 @@ public interface PostService {
     List<Post> getAllPost();
 
     int savePost(Post post);
+
+    void deletePost(Integer id);
 }

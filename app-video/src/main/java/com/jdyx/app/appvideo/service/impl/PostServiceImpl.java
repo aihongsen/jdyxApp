@@ -22,4 +22,9 @@ public class PostServiceImpl implements PostService {
     public int savePost(Post post) {
         return postMapper.insert(post);
     }
+
+    @Override
+    public void deletePost(Integer id) {
+        postMapper.deleteById(id);
+    }
 }

@@ -4,10 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.jdyx.app.bean.Post;
 import com.jdyx.app.service.PostService;
 import com.jdyx.app.util.ResultUtil;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import redis.clients.jedis.JedisPool;
 
@@ -25,8 +30,9 @@ public class PostController {
     @Autowired
     JedisPool jedisPool;
 
-    @RequestMapping("/getAllPost")
+    @RequestMapping(value = "/getAllPost",method = RequestMethod.GET)
     @ResponseBody
+    @ApiOperation("获取所有岗位")
     public Map<String,String> getAllPost(){
         try {
             List<Post> allPost = postService.getAllPost();
@@ -40,10 +46,15 @@ public class PostController {
 
     }
 
-    @RequestMapping("/savePost")
+    @RequestMapping(value = "/savePost",method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,String> savePost( Post post){
+    @ApiOperation("保存岗位")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "name", value = "岗位名称", required = true, dataType = "String"),
+    })
+    public Map<String,String> savePost(String name){
         try {
+            Post post = new Post(null, name);
             postService.savePost(post);
             log.info("添加岗位的id ：{}",post.getId());
             return ResultUtil.successMap("");
@@ -53,12 +64,15 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/deletePost")
+    @RequestMapping(value = "/deletePost",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,String>  deletePost(Post post){
+    @ApiOperation("删除岗位")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "id", value = "岗位id", required = true, dataType = "String"),
+    })
+    public Map<String,String>  deletePost(Integer id){
         try {
-            postService.savePost(post);
-            log.info("删除岗位的id ：{}", post.getId());
+            postService.deletePost(id);
             return ResultUtil.successMap("");
         }catch (Exception e){
             log.error("",e);
