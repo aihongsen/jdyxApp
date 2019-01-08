@@ -106,6 +106,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 jedis.close();
                 //返回消息给前端
                 result.put("code",200);
+                result.put("message","");
             } catch (ClientException e) {
                 //请求失败
                 result.put("code",403);
@@ -139,7 +140,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
         String key = Const.PHONE_PREFIX + phone + Const.PHONE_SUFFIX;
         String server_key = jedis.get(key);
-//        jedis.close();
+        jedis.close();
         //比对
         if(!code.equals(server_key)) {
             //异常
@@ -170,7 +171,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             //拼接环信信息
             HashMap<String, Object> map = new HashMap<>();
             String a = UUID.randomUUID().toString().replaceAll("-", "");
-            String username = a.substring(0,11) + "15801332983" + a.substring(20,32);
+            String username = a.substring(0,11) + phone + a.substring(20,32);
             String nickname = a.substring(0,6);
             map.put("username",username);
             map.put("password",Const.HUNXIN_PASSWORD);
@@ -186,24 +187,45 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (createUser(userInfo)<=0){
                     //注册失败
                     result.put("code",503);
-                    result.put("message","注册失败，服务器出错");
+                    result.put("message","注册失败，应用服务器出错");
                     return  result;
                 }
 
             } catch (IOException e) {
+                //注册环信账号失败
+                result.put("code",503);
+                result.put("message","注册失败，服务器出错");
                 e.printStackTrace();
             }
 
         }
+        //登录成功记录坐标
+        if(latitude == null){
+
+        }
+        if(longitude == null){
+
+        }
         //根据用户信息 创建返回数据
         //根据用户信息
-        Integer id = user.getId();
-        UserInfo info = userInfoMapper.selectById(id);
+        Integer userId = user.getId();
+        UserInfo info = userInfoMapper.selectById(userId);
         if(info != null){
             HashMap<String, Object> data = new HashMap<>();
-//            data.put("token",token);
-            data.put("openid",info.getConnectionName());
+            data.put("hx_name",info.getConnectionName());
             data.put("password",Const.HUNXIN_PASSWORD);
+            data.put("user_id",userId);
+            data.put("phone",info.getPhone());
+            data.put("nickname",info.getConnectionNickname());
+            String x = UUID.randomUUID().toString().replaceAll("-", "");
+            String token = x.substring(10, 31);
+            System.out.println(token);
+            Jedis jedis_token = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
+             //将验证码保存到redis中
+            String tokenName = Const.TOKEN_PREFIX+userId+Const.TOKEN_SUFFIX;
+            jedis_token.setex(tokenName, Const.TOKEN_PREFIX_CODE_RUNTIME, token);
+            jedis_token.close();
+            data.put("token",token);
             if(info.getName()== null || info.getGender() == null || info.getBirthday() == null || info.getEducation() ==null || info.getWorkYear() == null || info.getWorkYear() == null){
                 data.put("inf_status",0);   //未填写全信息
             }else {
@@ -211,10 +233,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             result.put("code",200);
             result.put("data",data);
+            result.put("message","");
         }else {
             result.put("code",408);
             result.put("message","请求超时");
         }
+
         return result;
 
     }

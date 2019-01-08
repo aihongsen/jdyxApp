@@ -2,6 +2,7 @@ package com.jdyx.app.usermanage.controller;
 
 import com.jdyx.app.bean.UserInfo;
 import com.jdyx.app.service.UserInfoService;
+import com.jdyx.app.usermanage.vo.UserInfoVo;
 import com.jdyx.app.util.Const;
 import com.jdyx.app.util.ObjectUtils;
 import io.swagger.annotations.Api;
@@ -76,8 +77,8 @@ public class UserInfoController {
     @ApiOperation(value="请求短信验证码(已完成)", notes="根据手机获取验证码")
     @RequestMapping(value = "/getSmsCode",method = RequestMethod.POST)
     @ApiImplicitParam(paramType="request", name = "phone", value = "手机号", required = true, dataType = "String")
-    public Object  requestVerification(String phone) {
-        return userInfoService.requestVerification(phone);
+    public Object  requestVerification(UserInfo userInfo){
+        return userInfoService.requestVerification(userInfo.getPhone());
     }
 
     /**
@@ -125,24 +126,35 @@ public class UserInfoController {
             @ApiImplicitParam(paramType="query", name = "expPostId[]", value = "学历", required = true, dataType = "array[]"),
     })
     @RequestMapping(value = "/personalInfo",method = RequestMethod.POST)
-    public Object personalInfo(Integer id,String phone,String name,String image_src,String gender,Date birthday,String education,String workYear,String expPostId[]){
+    public Object personalInfo(UserInfoVo userInfoVo){
         HashMap<Object, Object> result = new HashMap<>();
-        System.out.println(name.length());
         //1.获取参数校验
             //1.1判断用户是否存在
-            if(id == null || phone ==null || name== null || image_src== null){
-                result.put("code",400);
-                result.put("message","传参格式不正确,姓名不能为空");
-                return result;
+//            if(userInfoVo.getId() == null || userInfoVo.getPhone() ==null || userInfoVo.getName()== null || userInfoVo.getImageSrc()== null
+//            || userInfoVo.getGender() == null || userInfoVo.getBirthday() == null ||userInfoVo.getEducation() == null || userInfoVo.getWorkYear() == null ||
+//                    userInfoVo.getExpPostId() == null
+//            ){
+//                result.put("code",400);
+//                result.put("message","请确认信息是否完全填写再次提交");
+//                return result;
+//            }
+            if(userInfoVo.getName() == null){
+                 result.put("code",400);
+                 result.put("message","请确认信息是否完全填写再次提交");
             }
             //2.效验姓名
-            for (int i = 0; i < name.length(); i++) {
-                        if(!(name.charAt(i) >= 0x4E00 && name.charAt(i) <= 0x9FA5)){
+            for (int i = 0; i < userInfoVo.getName().length(); i++) {
+                        if(!(userInfoVo.getName().charAt(i) >= 0x4E00 && userInfoVo.getName().charAt(i) <= 0x9FA5)){
                             //不是中文
+                            result.put("code",400);
                             result.put("error","您输入的姓名不是中文");
 
                         }
             }
+            System.out.println(userInfoVo.getName());
+
+
+
 
 //        userInfo.setName(name);             //姓名
 //        userInfo.setGender(gender);         //性别

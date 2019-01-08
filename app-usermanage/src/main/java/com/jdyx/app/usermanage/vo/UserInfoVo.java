@@ -2,21 +2,20 @@ package com.jdyx.app.usermanage.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.jdyx.app.bean.ExpectationPost;
+import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
-public class UserInfoVo {
+@Data
+public class UserInfoVo implements Serializable {
     /**
      * 编号
      */
-    @TableId(type = IdType.AUTO)
     private Integer id;
-
-    /**
-     * 账号类别 0代表普通用户，1代表管理用户，2代表系统用户
-     */
-    private Integer accountType;
 
     /**
      * 手机号
@@ -54,8 +53,9 @@ public class UserInfoVo {
     private String workYear;
 
     /**
-     * 设备id 识别设备型号
+     *  期望岗位
      */
-    private String deviceId;
+    private List<ExpectationPostVo> expPostId;
+
 
 }
