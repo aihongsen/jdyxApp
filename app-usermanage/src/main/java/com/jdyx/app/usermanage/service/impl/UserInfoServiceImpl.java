@@ -178,11 +178,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             try {
                 //注册环信账号
                 EntitiesVo hunXinAccount = (EntitiesVo)NetUtil.registerHunXinAccount(map);
-                userInfo.setHunxinUuid(hunXinAccount.getUuid());        //对应环信账号UUID
-                userInfo.setHunxinName(hunXinAccount.getUsername());        //对应环信账号UUID
-                userInfo.setHunxinNickname(hunXinAccount.getNickname());        //对应环信账号UUID
+                userInfo.setConnectionUuid(hunXinAccount.getUuid());        //对应环信账号UUID
+                userInfo.setConnectionName(hunXinAccount.getUsername());        //对应环信账号UUID
+                userInfo.setConnectionNickname(hunXinAccount.getNickname());        //对应环信账号UUID
                 //注册成功  则在创建App账号
-
+                System.out.println(hunXinAccount);
                 if (createUser(userInfo)<=0){
                     //注册失败
                     result.put("code",503);
@@ -200,21 +200,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         Integer id = user.getId();
         UserInfo info = userInfoMapper.selectById(id);
         if(info != null){
-//            //创建token
-//            String u = UUID.randomUUID().toString().replaceAll("-", "");
-//            String token_key = u.substring(0,4) + "15801332983" + u.substring(28,32);
-//            String token = "token_info:"+token_key;
             HashMap<String, Object> data = new HashMap<>();
 //            data.put("token",token);
-            data.put("hunxinUUID",info.getHunxinUuid());
-            data.put("hunxinName",info.getHunxinName());
-            data.put("hunxinNickname",info.getHunxinNickname());
+            data.put("openid",info.getConnectionName());
+            data.put("password",Const.HUNXIN_PASSWORD);
             if(info.getName()== null || info.getGender() == null || info.getBirthday() == null || info.getEducation() ==null || info.getWorkYear() == null || info.getWorkYear() == null){
                 data.put("inf_status",0);   //未填写全信息
             }else {
                 data.put("inf_status",1);   //已填写全信息
             }
-
             result.put("code",200);
             result.put("data",data);
         }else {
@@ -222,15 +216,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             result.put("message","请求超时");
         }
         return result;
-        //创建token信息
-        //调用Jedis
-//        Jedis jedis = new Jedis(Const.SERVER_ADDRESS,Const.SERVER_REDIS_PORT);
-
-//        //保存到redis里
-//        ObjectUtils.
-//        jedis.close();
-//        Object success = result.put("success","true");
-
 
     }
 
