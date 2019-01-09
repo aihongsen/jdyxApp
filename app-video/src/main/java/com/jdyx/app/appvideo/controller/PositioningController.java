@@ -40,14 +40,17 @@ public class PositioningController {
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String")
     })
     public Object savePositioning(Integer userId, BigDecimal latitude,BigDecimal longitude){
+        if(userId==null){
+            return  ResultUtil.exceptionMap("2019","用户id无效");
+        }
         if(latitude==null||longitude==null){
-            return  ResultUtil.exceptionMap("403","没有找到定位信息");
+            return  ResultUtil.exceptionMap("2019","定位信息无效");
         }
         try {
             positioningService.savePositioning(new Positioning(userId,latitude,longitude));
             return ResultUtil.successMap("");
         }catch (Exception e){
-            log.error("",e);
+            log.error("保存定位失败 ",e);
             return ResultUtil.errorMap();
         }
     }

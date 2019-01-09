@@ -52,7 +52,27 @@ public class VideoDisplayVo  implements Serializable{
     /**
      * 音乐地址
      */
-    private String musicDdress;
+    private String musicAddress;
+
+    /**
+     * 视频点赞数
+     */
+    private Integer videoLikes;
+
+    /**
+     * 视频浏览量
+     */
+    private Integer videoViews;
+
+    /**
+     * 视频分享量
+     */
+    private Integer videoShare;
+
+    /**
+     * 视频关注度
+     */
+    private Integer videoFollow;
 
     /**
      * 岗位id

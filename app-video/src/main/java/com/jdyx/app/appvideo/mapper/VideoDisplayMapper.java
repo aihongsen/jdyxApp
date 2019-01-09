@@ -11,5 +11,5 @@ import java.util.List;
 @Mapper
 public interface VideoDisplayMapper extends BaseMapper<VideoDisplay> {
 
-    List<VideoDisplayVo> getAllVideoDisplayVo(@Param("jobId") Integer jobId);
+    List<VideoDisplayVo> getAllVideoDisplayVo(@Param("jobId") Integer jobId, @Param("pageNow") Integer pageNow, @Param("pageSize") Integer pageSize);
 }

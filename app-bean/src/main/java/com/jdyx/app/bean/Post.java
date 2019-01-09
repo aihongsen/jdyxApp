@@ -12,8 +12,6 @@ import java.io.Serializable;
  * 描述:post表的实体类
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Post implements Serializable {
     /**
      * 编号

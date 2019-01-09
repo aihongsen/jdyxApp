@@ -16,8 +16,8 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     VideoDisplayMapper videoDisplayMapper;
 
     @Override
-    public List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId){
-        return videoDisplayMapper.getAllVideoDisplayVo(jobId);
+    public List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId, Integer pageNow,Integer pageSize){
+        return videoDisplayMapper.getAllVideoDisplayVo(jobId,pageNow,pageSize);
     }
 
     @Override

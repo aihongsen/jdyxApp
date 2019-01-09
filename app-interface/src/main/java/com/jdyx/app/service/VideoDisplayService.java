@@ -1,5 +1,6 @@
 package com.jdyx.app.service;
 
+import com.jdyx.app.bean.Page;
 import com.jdyx.app.bean.VideoDisplay;
 import com.jdyx.app.bean.VideoDisplayVo;
 
@@ -10,7 +11,7 @@ public interface VideoDisplayService {
      * 获取所有视频
      * @return
      */
-    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId);
+    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId,Integer pageNow,Integer pageSize);
 
     /**
      * 保存视频
