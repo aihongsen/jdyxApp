@@ -17,7 +17,7 @@ public class AccountDetails implements Serializable {
      * 编号
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Integer accountId;
 
     /**
      * 流水类型 0代表收益、1代表消费、2代表充值、2代表提现

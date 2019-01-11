@@ -25,4 +25,14 @@ public interface VideoDisplayService {
     List<VideoDisplay> getAllVideoDisplayById(Integer userId);
 
     void deleteVideoDisplay(Integer videoId);
+
+    void watchVideo(Integer videoId);
+
+    VideoDisplay likeVideo(Integer videoId);
+
+    VideoDisplay cancelLikeVideo(Integer videoId);
+
+    VideoDisplay getVideoDisplayByVideoId(Integer videoId);
+
+    int getVideoDisplayTotalByJobId(Integer jobId);
 }

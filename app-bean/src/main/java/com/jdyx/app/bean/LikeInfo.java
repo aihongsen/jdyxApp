@@ -19,7 +19,7 @@ public class LikeInfo implements Serializable {
      * 编号
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long likeId;
 
     /**
      * 短视频id
@@ -46,4 +46,8 @@ public class LikeInfo implements Serializable {
      */
     private Date followedDate;
 
+    /**
+     * 是否点赞
+     */
+    private Integer isLike=1;
 }

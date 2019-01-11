@@ -17,7 +17,7 @@ public class Post implements Serializable {
      * 编号
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Integer postId;
 
     /**
      * 岗位名称

@@ -1,5 +1,7 @@
 package com.jdyx.app.bean;
 
+
+import jdk.nashorn.internal.objects.annotations.Setter;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,7 +14,24 @@ public class Page implements Serializable {
 
     private int pageSize = 10; // 每页显示记录的条数
 
-//    private int totalCount; // 总的记录条数
+    private int totalRow; // 共多少行
+
+    private int totalPage; // 总的记录页数
+
     public List<VideoDisplayVo> videoDisplayVo;
 
+    @Setter
+    public void setTotalPage(int totalRow) {
+        this.totalPage=totalRow/pageSize;
+        if (totalRow % pageSize > 0){
+            this.totalPage += 1;
+        }
+    }
+    public int getTotalPage() {
+        return this.totalPage;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(2/10);
+    }
 }
