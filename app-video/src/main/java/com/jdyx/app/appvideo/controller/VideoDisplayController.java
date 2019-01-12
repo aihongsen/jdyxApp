@@ -54,14 +54,18 @@ public class VideoDisplayController {
             @ApiImplicitParam(paramType="query", name = "pageSize", value = "每页显示记录的条数", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "latitude", value = "经度", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String"),
-            @ApiImplicitParam(paramType="query", name = "jobId", value = "岗位id", required = false, dataType = "String")
+            @ApiImplicitParam(paramType="query", name = "jobId", value = "岗位id", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "releaseType", value = "短视频类型", required = true, dataType = "String")
     })
-    public Object getAllVideoDisplay(Page page, BigDecimal longitude, BigDecimal latitude, Integer jobId){
+    public Object getAllVideoDisplay(Page page, BigDecimal longitude, BigDecimal latitude, Integer jobId, Integer releaseType){
+        if (releaseType == null){
+            return ResultUtil.exceptionMap(2019,"releaseType无效");
+        }
         if(jobId != null && -1 == jobId ){
             jobId = null;
         }
-        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId,page.getPageNow()*page.getPageSize(),page.getPageSize());
-        if(longitude == null || latitude == null ){
+        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId,releaseType,page.getPageNow()*page.getPageSize(),page.getPageSize());
+        if(longitude == null || latitude == null){
             log.info("无定位信息");
         }else {
             for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
@@ -70,9 +74,17 @@ public class VideoDisplayController {
             }
         }
         //根据jobid获取总记录数
-        int totalRow = videoDisplayService.getVideoDisplayTotalByJobId(jobId);
-        //设置分页
+        int totalRow = 0;
+        if(jobId == null ){
+            totalRow = videoDisplayService.getVideoDisplayTotal(releaseType);
+        }else {
+            totalRow = videoDisplayService.getVideoDisplayTotalByJobId(jobId,releaseType);
+        }
+        //设置当前页数据
         page.setVideoDisplayVo(allVideoDisplay);
+        //设置当前页记录数
+        page.setPageSize(allVideoDisplay.size());
+        //设置总记录条数和总页数
         page.setTotalRow(totalRow);
         page.setTotalPage(page.getTotalRow());
         return ResultUtil.successMap(JSON.toJSON(page));
@@ -82,17 +94,27 @@ public class VideoDisplayController {
     @ResponseBody
     @ApiOperation(value="查看本人视频")
     @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "pageNow", value = "当前页数", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "pageSize", value = "每页显示记录的条数", required = false, dataType = "String"),
             @ApiImplicitParam(paramType="query", name = "userId", value = "用户id", required = true, dataType = "String")
     })
-    public Object getAllVideoDisplayByUserId(Integer userId){
+    public Object getAllVideoDisplayByUserId(Page page,Integer userId){
         if (userId == null || userId == 0){
-            return ResultUtil.exceptionMap(2019,"无效的参数数据");
+            return ResultUtil.exceptionMap(2019,"userId无效");
         }
         try {
-            List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayById(userId);
-            Object json = JSON.toJSON(allVideoDisplay);
-            log.info("获取该用户所有视频 ：{}",json);
-            return ResultUtil.successMap(json);
+            //查找当前页数据
+            List<VideoDisplay> allVideoDisplay = videoDisplayService.getAllVideoDisplayPageById(userId,page.getPageNow(),page.getPageSize());
+            //查看该用户总记录数
+            List<VideoDisplay> allVideoDisplayById = videoDisplayService.getAllVideoDisplayById(userId);
+            //设置当前页数据
+            page.setVideoDisplayVo(allVideoDisplay);
+            //设置当前页记录数
+            page.setPageSize(allVideoDisplay.size());
+            //设置总记录条数和总页数
+            page.setTotalRow(allVideoDisplayById.size());
+            page.setTotalPage(page.getTotalRow());
+            return ResultUtil.successMap(page);
         }catch (Exception e){
             log.error("",e);
             return ResultUtil.errorMap();

@@ -13,7 +13,19 @@
         <if test="jobId != null">
             vd.`job_id`= #{jobId} and
         </if>
-        vd.`is_delete`=0 AND vd.`is_hidden`=0 AND vd.`is_violation`=0
+        vd.`release_type` = #{releaseType} and vd.`is_delete`=0 AND vd.`is_hidden`=0 AND vd.`is_violation`=0
+        ORDER BY vd.`video_date` DESC
+        LIMIT #{pageNow},#{pageSize}
+    </select>
+    <select id="getAllVideoDisplayPageById" resultType="com.jdyx.app.bean.VideoDisplay">
+        SELECT vd.*
+        FROM `video_display` vd
+        LEFT JOIN user_info ui on ui.id = vd.`user_id`
+        WHERE
+        <if test="userId != null">
+            vd.`user_id`= #{userId} and
+        </if>
+        vd.`is_delete`=0
         ORDER BY vd.`video_date` DESC
         LIMIT #{pageNow},#{pageSize}
     </select>

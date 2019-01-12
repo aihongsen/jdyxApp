@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class Page implements Serializable {
+public class Page<T> implements Serializable {
 
     private int pageNow = 0; // 当前页数
 
@@ -18,7 +18,7 @@ public class Page implements Serializable {
 
     private int totalPage; // 总的记录页数
 
-    public List<VideoDisplayVo> videoDisplayVo;
+    public List<T> videoDisplayVo;
 
     @Setter
     public void setTotalPage(int totalRow) {

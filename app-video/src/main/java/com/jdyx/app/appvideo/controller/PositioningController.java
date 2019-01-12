@@ -54,7 +54,7 @@ public class PositioningController {
 
     @RequestMapping(value = "/getCityByProvinceId",method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value="根据ProvinceCode获取城市信息")
+    @ApiOperation(value="根据provinceCode获取城市信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query", name = "provinceCode", value = "省份code", required = true, dataType = "String")
     })
@@ -73,7 +73,7 @@ public class PositioningController {
 
     @RequestMapping(value = "/getAreaByCityCode",method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value="根据ProvinceCode获取城市信息")
+    @ApiOperation(value="根据cityCode获取城市信息")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query", name = "cityCode", value = "城市code", required = true, dataType = "String")
     })
@@ -107,10 +107,11 @@ public class PositioningController {
             @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String")
     })
     public Object savePositioning(Integer userId, BigDecimal latitude,BigDecimal longitude){
+
         if(userId==null ||userId ==0){
             return  ResultUtil.exceptionMap(2019,"用户id无效");
         }
-        if(latitude==null||longitude==null){
+        if(latitude==null||longitude==null||BigDecimal.ZERO.equals(latitude)||BigDecimal.ZERO.equals(longitude)){
             return  ResultUtil.exceptionMap(2019,"定位信息无效");
         }
         try {

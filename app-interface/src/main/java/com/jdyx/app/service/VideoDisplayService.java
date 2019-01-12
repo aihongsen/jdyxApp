@@ -11,7 +11,7 @@ public interface VideoDisplayService {
      * 获取所有视频
      * @return
      */
-    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId,Integer pageNow,Integer pageSize);
+    List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId,Integer releaseType,Integer pageNow,Integer pageSize);
 
     /**
      * 保存视频
@@ -34,5 +34,9 @@ public interface VideoDisplayService {
 
     VideoDisplay getVideoDisplayByVideoId(Integer videoId);
 
-    int getVideoDisplayTotalByJobId(Integer jobId);
+    int getVideoDisplayTotalByJobId(Integer jobId,Integer releaseType);
+
+    int getVideoDisplayTotal(Integer releaseType);
+
+    List<VideoDisplay> getAllVideoDisplayPageById(Integer userId, Integer pageNow, Integer pageSize);
 }
