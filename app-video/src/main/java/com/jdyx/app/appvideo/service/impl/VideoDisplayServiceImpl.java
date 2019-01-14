@@ -16,8 +16,8 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     VideoDisplayMapper videoDisplayMapper;
 
     @Override
-    public List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId){
-        return videoDisplayMapper.getAllVideoDisplayVo(jobId);
+    public List<VideoDisplayVo> getAllVideoDisplayVo(Integer jobId,Integer releaseType, Integer pageNow,Integer pageSize){
+        return videoDisplayMapper.getAllVideoDisplayVo(jobId,releaseType,pageNow,pageSize);
     }
 
     @Override
@@ -27,8 +27,12 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
 
     @Override
     public List<VideoDisplay> getAllVideoDisplayById(Integer userId) {
-        QueryWrapper<VideoDisplay> queryWrapper = new QueryWrapper<VideoDisplay>().eq("user_id",userId);
-        return videoDisplayMapper.selectList(queryWrapper);
+        return videoDisplayMapper.selectList(new QueryWrapper<VideoDisplay>().eq("user_id",userId));
+    }
+
+    @Override
+    public List<VideoDisplay> getAllVideoDisplayPageById(Integer userId,Integer pageNow,Integer pageSize) {
+        return videoDisplayMapper.getAllVideoDisplayPageById(userId,pageNow,pageSize);
     }
 
     @Override
@@ -36,5 +40,43 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
         videoDisplayMapper.delete(new QueryWrapper<VideoDisplay>().eq("id",id));
     }
 
+    @Override
+    public void watchVideo(Integer videoId) {
+
+        VideoDisplay videoDisplay = videoDisplayMapper.selectById(videoId);
+        videoDisplay.setVideoViews(videoDisplay.getVideoViews()+1);
+        videoDisplayMapper.updateById(videoDisplay);
+    }
+
+    @Override
+    public VideoDisplay likeVideo(Integer videoId) {
+        VideoDisplay videoDisplay = videoDisplayMapper.selectById(videoId);
+        videoDisplay.setVideoLikes(videoDisplay.getVideoLikes()+1);
+        int i = videoDisplayMapper.updateById(videoDisplay);
+        return videoDisplay;
+    }
+
+    @Override
+    public VideoDisplay cancelLikeVideo(Integer videoId) {
+        VideoDisplay videoDisplay = videoDisplayMapper.selectById(videoId);
+        videoDisplay.setVideoLikes(videoDisplay.getVideoLikes()-1);
+        videoDisplayMapper.updateById(videoDisplay);
+        return videoDisplay;
+    }
+
+    @Override
+    public VideoDisplay getVideoDisplayByVideoId(Integer videoId) {
+        return videoDisplayMapper.selectById(videoId);
+    }
+
+    @Override
+    public int getVideoDisplayTotalByJobId(Integer jobId,Integer releaseType) {
+        return videoDisplayMapper.selectCount(new QueryWrapper<VideoDisplay>().eq("job_id",jobId).eq("release_type",releaseType));
+    }
+
+    @Override
+    public int getVideoDisplayTotal(Integer releaseType) {
+        return videoDisplayMapper.selectCount(new QueryWrapper<VideoDisplay>().eq("release_type",releaseType));
+    }
 
 }

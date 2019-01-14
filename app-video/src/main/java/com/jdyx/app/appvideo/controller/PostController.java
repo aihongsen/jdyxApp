@@ -7,7 +7,6 @@ import com.jdyx.app.util.ResultUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import redis.clients.jedis.JedisPool;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequestMapping("/post")
@@ -53,10 +51,12 @@ public class PostController {
             @ApiImplicitParam(paramType="query", name = "name", value = "岗位名称", required = true, dataType = "String"),
     })
     public Object savePost(Post post){
+        if (post.getName()==null){
+            return ResultUtil.exceptionMap(2019,"岗位名称无效");
+        }
         try {
-//            Post post = new Post(null, name);
             postService.savePost(post);
-            log.info("添加岗位的id ：{}",post.getId());
+            log.info("添加岗位的id ：{}",post.getPostId());
             return ResultUtil.successMap("");
         }catch (Exception e){
             log.error("",e);
@@ -71,6 +71,9 @@ public class PostController {
             @ApiImplicitParam(paramType="query", name = "id", value = "岗位id", required = true, dataType = "String"),
     })
     public Object  deletePost(Integer id){
+        if (id==null){
+            return ResultUtil.exceptionMap(2019,"岗位id无效");
+        }
         try {
             postService.deletePost(id);
             return ResultUtil.successMap("");

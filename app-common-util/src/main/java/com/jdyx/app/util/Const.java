@@ -23,4 +23,13 @@ public class Const {
 	public static final String HUNXIN_PASSWORD = "Jdyx12345678";
 	public static final String REGEX_MOBILE = "^((17[0-9])|(14[0-9])|(13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";	//正则手机号
 
+	public static final String ACCESS_KEY = "mrspbXHzeXCXjq-dqfimKxVG_3ZUH2_PnKm97TKS";//七牛云账号的SK
+	public static final String SECRET_KEY = "YmarNqrqapJpSuCYEfnOKxSNjEIUNJ42Iy23Ebas";//七牛云账号的SK
+	public static final String BUCKET_NAME = "default"; //七牛空间名称
+	public static final String QINIU_ADRESS = "http://v.jdyxqq.com/"; //七牛空间地址开头
+	public static final String PICTURE_URL = "http://v.jdyxqq.com/jdyx.gif";//水印地址
+	public static final String PIPELINE = "default";//七牛云转码的队列
+	public static final String LIKE_VIDEO="like:video:";
+	public static final String WATCH_VIDEO="watch:video:";
+
 }

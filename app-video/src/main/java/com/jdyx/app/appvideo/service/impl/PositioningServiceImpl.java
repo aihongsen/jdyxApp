@@ -14,6 +14,7 @@ public class PositioningServiceImpl implements PositioningService{
 
     @Autowired
     PositioningMapper positioningMapper;
+
     @Override
     public void savePositioning(Positioning positioning) {
         QueryWrapper<Positioning> queryWrapper = new QueryWrapper<Positioning>().eq("user_id", positioning.getUserId());
