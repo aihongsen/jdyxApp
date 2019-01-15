@@ -1,12 +1,8 @@
 package com.jdyx.app.usermanage.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.jdyx.app.bean.ExpectationPost;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +36,7 @@ public class UserInfoVo implements Serializable {
     /**
      * 出生日期
      */
-    private Date birthday;
+    private String birthday;
 
     /**
      * 学历 0代表高中以下、1代表大专、2代表本科、3代表本科以上

@@ -25,7 +25,7 @@ public class AppUsermanageApplicationTests {
         UserInfo userInfo = new UserInfo();
         userInfo.setPhone("15801332983");
         userInfo.setName("小寒");
-        UserInfo user = userInfoMapper.getUserByPhone(userInfo);
+        UserInfo user = userInfoMapper.getUserByPhone(userInfo.getPhone());
         System.out.println(userInfo);
     }
 
