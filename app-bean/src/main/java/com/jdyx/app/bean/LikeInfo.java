@@ -47,7 +47,12 @@ public class LikeInfo implements Serializable {
     private Date followedDate;
 
     /**
-     * 是否点赞
+     * 是否点赞 0未点赞，1已点赞
      */
     private Integer isLike=1;
+
+    /**
+     * 是否已读 0未读，1已读
+     */
+    private Integer isSeen=0;
 }

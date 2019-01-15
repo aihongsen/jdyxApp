@@ -2,6 +2,7 @@ package com.jdyx.app.appvideo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jdyx.app.appvideo.mapper.LikeInfoMapper;
+import com.jdyx.app.bean.LikeAndAttentionVo;
 import com.jdyx.app.bean.LikeInfo;
 import com.jdyx.app.service.LikeInfoService;
 import com.jdyx.app.util.ResultUtil;
@@ -29,5 +30,10 @@ public class LikeInfoServiceImpl implements LikeInfoService {
     @Override
     public LikeInfo getLikeInfo(LikeInfo likeInfo) {
         return likeInfoMapper.selectOne(new QueryWrapper<LikeInfo>().eq("video_id",likeInfo.getVideoId()).eq("followed_id",likeInfo.getFollowedId()));
+    }
+
+    @Override
+    public LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer userId) {
+        return likeInfoMapper.getLikeInfoAndAttentionInfo(videoId,userId);
     }
 }

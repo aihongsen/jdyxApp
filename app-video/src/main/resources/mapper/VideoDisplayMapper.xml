@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jdyx.app.appvideo.mapper.VideoDisplayMapper">
 
-    <select id="getAllVideoDisplayVo" resultType="com.jdyx.app.bean.VideoDisplayVo" parameterType="integer">
+    <select id="getAllVideoDisplayVo" resultType="com.jdyx.app.bean.VideoDisplayVo" >
         SELECT vd.`video_id`,vd.`user_id`,vd.`release_type`,vd.`video_title`,vd.`video_description`,vd.`video_picture`,vd.`video_address`,
         vd.`video_watermark_address`,vd.`job_id`,vd.`is_delete`,vd.`video_date`,vd.`video_likes`,
-        vd.`video_views`,vd.`video_share`,vd.`video_follow`,pt.`latitude`,pt.`longitude`,ui.`image_src`
+        vd.`video_views`,vd.`video_share`,vd.`video_follow`,pt.`latitude`,pt.`longitude`,ui.`image_src`,ui.name userName
         FROM `video_display` vd
         LEFT JOIN user_info ui on ui.id = vd.`user_id`
         LEFT JOIN `positioning` pt ON vd.`user_id` = pt.`user_id`

@@ -102,4 +102,10 @@ public class VideoDisplayVo  implements Serializable{
      * 用户头像
      */
     private String imageSrc;
+
+    /**
+     * 用户名称
+     */
+    private String userName;
+
 }

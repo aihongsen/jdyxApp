@@ -1,5 +1,7 @@
 package com.jdyx.app.util;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public class ResultUtil {
         HashMap<Object, Object> map = new HashMap<>();
         map.put("code",500);
         map.put("message","服务器异常");
-        map.put("data","");
+        map.put("data", JSON.toJSON(new Object()));
         return map;
     }
 
@@ -24,7 +26,7 @@ public class ResultUtil {
         HashMap<Object, Object> map = new HashMap<>();
         map.put("code",code);
         map.put("message",message);
-        map.put("data","");
+        map.put("data",JSON.toJSON(new Object()));
         return map;
     }
 }

@@ -61,33 +61,44 @@ public class VideoDisplayController {
         if (releaseType == null){
             return ResultUtil.exceptionMap(2019,"releaseType无效");
         }
+        //ios传入-1为空
         if(jobId != null && -1 == jobId ){
             jobId = null;
         }
-        List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId,releaseType,page.getPageNow()*page.getPageSize(),page.getPageSize());
-        if(longitude == null || latitude == null){
-            log.info("无定位信息");
-        }else {
-            for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
-                String distance = DistanceUtil.algorithm(videoDisplayVo.getLongitude().doubleValue(), videoDisplayVo.getLatitude().doubleValue(), longitude.doubleValue(), latitude.doubleValue());
-                videoDisplayVo.setDistance(distance);
+        try {
+            List<VideoDisplayVo> allVideoDisplay = videoDisplayService.getAllVideoDisplayVo(jobId,releaseType,page.getPageNow()*page.getPageSize(),page.getPageSize());
+            if(longitude == null || latitude == null||BigDecimal.ZERO.equals(latitude)||BigDecimal.ZERO.equals(longitude)){
+                log.info("无定位信息");
+            }else {
+                for (VideoDisplayVo videoDisplayVo : allVideoDisplay) {
+                    String distance = DistanceUtil.algorithm(videoDisplayVo.getLongitude().doubleValue(), videoDisplayVo.getLatitude().doubleValue(), longitude.doubleValue(), latitude.doubleValue());
+                    videoDisplayVo.setDistance(distance);
+                }
             }
+            //根据jobid获取总记录数
+            int totalRow = 0;
+            //ios无法填null，默认0
+            if(jobId == null || jobId == 0){
+                totalRow = videoDisplayService.getVideoDisplayTotal(releaseType);
+            }else {
+                totalRow = videoDisplayService.getVideoDisplayTotalByJobId(jobId,releaseType);
+            }
+            if (allVideoDisplay.size()!=0){
+                //设置当前页数据
+                page.setVideoDisplayVo(allVideoDisplay);
+                //设置当前页记录数
+                page.setPageSize(allVideoDisplay.size());
+                //设置总记录条数和总页数
+                page.setTotalRow(totalRow);
+                page.setTotalPage(page.getTotalRow());
+                return ResultUtil.successMap(page);
+            }else {
+                return ResultUtil.exceptionMap(2023,"已无视频数据");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultUtil.errorMap();
         }
-        //根据jobid获取总记录数
-        int totalRow = 0;
-        if(jobId == null ){
-            totalRow = videoDisplayService.getVideoDisplayTotal(releaseType);
-        }else {
-            totalRow = videoDisplayService.getVideoDisplayTotalByJobId(jobId,releaseType);
-        }
-        //设置当前页数据
-        page.setVideoDisplayVo(allVideoDisplay);
-        //设置当前页记录数
-        page.setPageSize(allVideoDisplay.size());
-        //设置总记录条数和总页数
-        page.setTotalRow(totalRow);
-        page.setTotalPage(page.getTotalRow());
-        return ResultUtil.successMap(JSON.toJSON(page));
     }
 
     @RequestMapping(value = "/getAllVideoDisplayById",method = RequestMethod.GET)
@@ -190,7 +201,7 @@ public class VideoDisplayController {
      */
     @RequestMapping(value = "/getVideoDisplayByVideoId",method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value="保存视频")
+    @ApiOperation(value="根据视频id查看个人视频")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String")
     })
@@ -214,7 +225,7 @@ public class VideoDisplayController {
      */
     @RequestMapping(value = "/deleteVideoDisplay",method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value="保存视频")
+    @ApiOperation(value="逻辑删除视频")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String")
     })
@@ -286,36 +297,42 @@ public class VideoDisplayController {
         }
     }
 
-    @RequestMapping(value = "/watchVideo",method = RequestMethod.GET)
+    @RequestMapping(value = "/watchVideo",method = RequestMethod.POST)
     @ResponseBody
-    @ApiOperation(value="观看视频，增加视频播放次数")
+    @ApiOperation(value="观看视频，增加视频播放次数,返回关注点赞信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String")
+            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType="query",name = "userId", value = "查看人id", required = true, dataType = "String")
     })
-    public Object watchVideo(Integer videoId){
+    public Object watchVideo(Integer videoId,Integer userId){
         if (videoId==null || videoId==0){
             return ResultUtil.exceptionMap(2019,"视频id无效");
+        }
+        if (userId==null || userId==0){
+            return ResultUtil.exceptionMap(2019,"查看人id无效");
         }
         try {
             //数据库修改播放次数
             videoDisplayService.watchVideo(videoId);
-            return ResultUtil.successMap("");
+            //返回关注点赞信息
+            LikeAndAttentionVo likeAndAttentionVo=likeInfoService.getLikeInfoAndAttentionInfo(videoId,userId);
+            return ResultUtil.successMap(likeAndAttentionVo);
         } catch (Exception e) {
             e.printStackTrace();
             return ResultUtil.exceptionMap(2020,"存储数据失败");
         }
     }
     /**
-     * 视频点赞
+     * 查看是否已点赞视频
      * @param likeInfo
      * @return
      */
     @RequestMapping(value = "/getLikeInfo",method = RequestMethod.POST)
     @ResponseBody
-    @ApiOperation(value="视频点赞")
+    @ApiOperation(value="查看是否已点赞视频")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
-            @ApiImplicitParam(paramType="query",name = "followedId", value = "点赞人id", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType="query",name = "followedId", value = "点赞人id", required = true, dataType = "String")
     })
     public Object getLikeInfo(LikeInfo likeInfo){
         if (likeInfo.getVideoId()==null || likeInfo.getVideoId()==0){
@@ -356,11 +373,13 @@ public class VideoDisplayController {
             return ResultUtil.exceptionMap(2019,"点赞人姓名id无效");
         }
         try {
-            //存储点赞信息到数据库
+            //查询点赞信息
             LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
             if (selectOne!=null){
                 return ResultUtil.exceptionMap(2022,"已点赞");
             }else {
+                //存储点赞信息到数据库
+                likeInfo.setFollowedDate(new Date());
                 VideoDisplay videoDisplay = videoDisplayService.likeVideo(likeInfo.getVideoId());
                 //保存关注数据
                 likeInfo.setFollowedDate(new Date());
@@ -379,7 +398,7 @@ public class VideoDisplayController {
 
 
     /**
-     * 视频点赞
+     * 取消视频点赞
      * @param likeInfo
      * @return
      */

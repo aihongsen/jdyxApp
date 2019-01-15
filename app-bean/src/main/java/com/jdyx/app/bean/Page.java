@@ -23,6 +23,7 @@ public class Page<T> implements Serializable {
     @Setter
     public void setTotalPage(int totalRow) {
         this.totalPage=totalRow/pageSize;
+
         if (totalRow % pageSize > 0){
             this.totalPage += 1;
         }
@@ -32,6 +33,8 @@ public class Page<T> implements Serializable {
     }
 
     public static void main(String[] args) {
-        System.out.println(2/10);
+        int x= 0;
+        x+=1;
+        System.out.println(x);
     }
 }

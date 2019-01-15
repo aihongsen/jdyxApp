@@ -1,5 +1,6 @@
 package com.jdyx.app.service;
 
+import com.jdyx.app.bean.LikeAndAttentionVo;
 import com.jdyx.app.bean.LikeInfo;
 
 public interface LikeInfoService  {
@@ -9,4 +10,6 @@ public interface LikeInfoService  {
     void deleteLikeInfo(LikeInfo likeInfo);
 
     LikeInfo getLikeInfo(LikeInfo likeInfo);
+
+    LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer userId);
 }

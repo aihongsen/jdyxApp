@@ -2,6 +2,7 @@ package com.jdyx.app.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -42,5 +43,15 @@ public class AttentionInfo implements Serializable {
      * 关注日期
      */
     private Date followedDate;
+
+    /**
+     * 是否关注
+     */
+    private Integer isAttention;
+
+    /**
+     * 是否已读
+     */
+    private Integer isSeen;
 
 }

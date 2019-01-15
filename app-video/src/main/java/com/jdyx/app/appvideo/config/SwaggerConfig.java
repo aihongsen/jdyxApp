@@ -44,7 +44,7 @@ public class SwaggerConfig {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("京典一线API列表  代码200 请求成功、代码400 请求参数错误、代码403 请求错误、404 请求为找到、500 服务器出错")
+                .title("京典一线API列表 代码2021 视频增加水印失败、代码2022 已点赞/未点赞、2023 已无视频数据")
                 .description("地址：http://192.168.0.106:8080/swagger-ui.html")
                 .termsOfServiceUrl("http://192.168.0.106:8080/")
                 .contact("liubotong")
