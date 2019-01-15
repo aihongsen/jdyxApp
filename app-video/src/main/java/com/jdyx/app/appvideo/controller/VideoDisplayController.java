@@ -195,23 +195,31 @@ public class VideoDisplayController {
         }
     }
     /**
-     * 根据视频id查看个人视频
+     * 根据视频id查看视频,包含视频发布人头像，名字
      * @param videoId
      * @return
      */
     @RequestMapping(value = "/getVideoDisplayByVideoId",method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value="根据视频id查看个人视频")
+    @ApiOperation(value="根据视频id查看视频")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String")
+            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType="query",name = "followedId", value = "点赞人id", required = false, dataType = "String")
     })
-    public Object getVideoDisplayByVideoId(Integer videoId){
+    public Object getVideoDisplayByVideoId(Integer videoId,Integer followedId){
         if(videoId ==null || videoId==0 ){
             return ResultUtil.exceptionMap(2019,"视频id无效");
         }
         try {
-            VideoDisplay videoDisplay = videoDisplayService.getVideoDisplayByVideoId(videoId);
-            return ResultUtil.successMap(videoDisplay);
+            //未登陆只查看视频信息
+            if (followedId == null || followedId == 0){
+                LikeAndAttentionVo likeAndAttentionVo = videoDisplayService.getVideoDisplayByVideoId(videoId);
+                return ResultUtil.successMap(likeAndAttentionVo);
+            }else {
+                //已登录增加：是否点赞、是否关注
+                LikeAndAttentionVo likeAndAttentionVo = likeInfoService.getLikeInfoAndAttentionInfo(videoId, followedId);
+                return ResultUtil.successMap(likeAndAttentionVo);
+            }
         }catch (Exception e){
             log.error("",e);
             return ResultUtil.errorMap();
@@ -231,7 +239,7 @@ public class VideoDisplayController {
     })
     public Object deleteVideoDisplay(Integer videoId){
         if(videoId ==null || videoId==0 ){
-            return ResultUtil.exceptionMap(2019,"无效的参数数据");
+            return ResultUtil.exceptionMap(2019,"视频id无效");
         }
         try {
             videoDisplayService.deleteVideoDisplay(videoId);
@@ -297,62 +305,57 @@ public class VideoDisplayController {
         }
     }
 
-    @RequestMapping(value = "/watchVideo",method = RequestMethod.POST)
+    @RequestMapping(value = "/watchVideo",method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value="观看视频，增加视频播放次数,返回关注点赞信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
-            @ApiImplicitParam(paramType="query",name = "userId", value = "查看人id", required = true, dataType = "String")
+            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String")
     })
-    public Object watchVideo(Integer videoId,Integer userId){
+    public Object watchVideo(Integer videoId){
         if (videoId==null || videoId==0){
             return ResultUtil.exceptionMap(2019,"视频id无效");
-        }
-        if (userId==null || userId==0){
-            return ResultUtil.exceptionMap(2019,"查看人id无效");
         }
         try {
             //数据库修改播放次数
             videoDisplayService.watchVideo(videoId);
             //返回关注点赞信息
-            LikeAndAttentionVo likeAndAttentionVo=likeInfoService.getLikeInfoAndAttentionInfo(videoId,userId);
-            return ResultUtil.successMap(likeAndAttentionVo);
+            return ResultUtil.successMap("");
         } catch (Exception e) {
             e.printStackTrace();
             return ResultUtil.exceptionMap(2020,"存储数据失败");
         }
     }
-    /**
-     * 查看是否已点赞视频
-     * @param likeInfo
-     * @return
-     */
-    @RequestMapping(value = "/getLikeInfo",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value="查看是否已点赞视频")
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
-            @ApiImplicitParam(paramType="query",name = "followedId", value = "点赞人id", required = true, dataType = "String")
-    })
-    public Object getLikeInfo(LikeInfo likeInfo){
-        if (likeInfo.getVideoId()==null || likeInfo.getVideoId()==0){
-            return ResultUtil.exceptionMap(2019,"视频id无效");
-        }
-        if (likeInfo.getFollowedId()==null || likeInfo.getFollowedId()==0 ){
-            return ResultUtil.exceptionMap(2019,"点赞人id无效");
-        }
-        LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
-        return ResultUtil.successMap("");
-    }
+//    /**
+//     * 查看是否已点赞视频
+//     * @param likeInfo
+//     * @return
+//     */
+//    @RequestMapping(value = "/getLikeInfo",method = RequestMethod.POST)
+//    @ResponseBody
+//    @ApiOperation(value="查看是否已点赞视频")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
+//            @ApiImplicitParam(paramType="query",name = "followedId", value = "点赞人id", required = true, dataType = "String")
+//    })
+//    public Object getLikeInfo(LikeInfo likeInfo){
+//        if (likeInfo.getVideoId()==null || likeInfo.getVideoId()==0){
+//            return ResultUtil.exceptionMap(2019,"视频id无效");
+//        }
+//        if (likeInfo.getFollowedId()==null || likeInfo.getFollowedId()==0 ){
+//            return ResultUtil.exceptionMap(2019,"点赞人id无效");
+//        }
+//        LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
+//        return ResultUtil.successMap("");
+//    }
 
     /**
-     * 视频点赞
+     * 取消或点赞视频
      * @param likeInfo
      * @return
      */
     @RequestMapping(value = "/likeVideo",method = RequestMethod.POST)
     @ResponseBody
-    @ApiOperation(value="视频点赞")
+    @ApiOperation(value="取消或点赞视频")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
             @ApiImplicitParam(paramType="query",name = "userId", value = "短视频所属人id", required = true, dataType = "String"),
@@ -370,64 +373,33 @@ public class VideoDisplayController {
             return ResultUtil.exceptionMap(2019,"点赞人id无效");
         }
         if (StringUtils.isEmpty(likeInfo.getFollName())){
-            return ResultUtil.exceptionMap(2019,"点赞人姓名id无效");
+            return ResultUtil.exceptionMap(2019,"点赞人姓名无效");
         }
         try {
             //查询点赞信息
             LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
             if (selectOne!=null){
-                return ResultUtil.exceptionMap(2022,"已点赞");
-            }else {
-                //存储点赞信息到数据库
-                likeInfo.setFollowedDate(new Date());
-                VideoDisplay videoDisplay = videoDisplayService.likeVideo(likeInfo.getVideoId());
-                //保存关注数据
-                likeInfo.setFollowedDate(new Date());
-                likeInfoService.saveLikeInfo(likeInfo);
-                LikeInfoVo likeInfoVo = new LikeInfoVo();
-                likeInfoVo.setVideoId(videoDisplay.getVideoId());
-                likeInfoVo.setIsLike(1);
-                likeInfoVo.setVideoLikes(videoDisplay.getVideoLikes());
-                return ResultUtil.successMap(JSON.toJSON(likeInfoVo));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResultUtil.exceptionMap(2020,"存储数据失败");
-        }
-    }
-
-
-    /**
-     * 取消视频点赞
-     * @param likeInfo
-     * @return
-     */
-    @RequestMapping(value = "/cancelLikeVideo",method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value="取消视频点赞")
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
-            @ApiImplicitParam(paramType="query",name = "followedId", value = "取消点赞人id", required = true, dataType = "String")
-    })
-    public Object cancelLikeVideo(LikeInfo likeInfo){
-        if (likeInfo == null || likeInfo.getVideoId() == null || likeInfo.getVideoId() == 0){
-            return ResultUtil.exceptionMap(2019,"视频id无效");
-        }
-        if (likeInfo.getFollowedId() == null){
-            return ResultUtil.exceptionMap(2019,"取消点赞人id无效");
-        }
-        try {
-            //查看点赞信息
-            LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
-            if (selectOne == null){
-                return ResultUtil.exceptionMap(2022,"未点赞");
-            }else {
+                //取消点赞
                 VideoDisplay videoDisplay = videoDisplayService.cancelLikeVideo(likeInfo.getVideoId());
                 //删除关注信息
                 likeInfoService.deleteLikeInfo(likeInfo);
                 LikeInfoVo likeInfoVo = new LikeInfoVo();
                 likeInfoVo.setVideoId(videoDisplay.getVideoId());
                 likeInfoVo.setIsLike(0);
+                likeInfoVo.setVideoLikes(videoDisplay.getVideoLikes());
+                return ResultUtil.successMap(JSON.toJSON(likeInfoVo));
+            }else {
+                //点赞
+                //存储点赞信息到数据库
+                likeInfo.setFollowedDate(new Date());
+                VideoDisplay videoDisplay = videoDisplayService.likeVideo(likeInfo.getVideoId());
+                //保存关注数据
+                likeInfo.setFollowedDate(new Date());
+                int i = likeInfoService.saveLikeInfo(likeInfo);
+
+                LikeInfoVo likeInfoVo = new LikeInfoVo();
+                likeInfoVo.setVideoId(videoDisplay.getVideoId());
+                likeInfoVo.setIsLike(likeInfo.getIsLike());
                 likeInfoVo.setVideoLikes(videoDisplay.getVideoLikes());
                 return ResultUtil.successMap(JSON.toJSON(likeInfoVo));
             }
@@ -437,4 +409,38 @@ public class VideoDisplayController {
         }
     }
 
+
+//    /**
+//     * 取消视频点赞
+//     * @param likeInfo
+//     * @return
+//     */
+//    @RequestMapping(value = "/cancelLikeVideo",method = RequestMethod.POST)
+//    @ResponseBody
+//    @ApiOperation(value="取消视频点赞")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(paramType="query",name = "videoId", value = "视频id", required = true, dataType = "String"),
+//            @ApiImplicitParam(paramType="query",name = "followedId", value = "取消点赞人id", required = true, dataType = "String")
+//    })
+//    public Object cancelLikeVideo(LikeInfo likeInfo){
+//        if (likeInfo == null || likeInfo.getVideoId() == null || likeInfo.getVideoId() == 0){
+//            return ResultUtil.exceptionMap(2019,"视频id无效");
+//        }
+//        if (likeInfo.getFollowedId() == null){
+//            return ResultUtil.exceptionMap(2019,"取消点赞人id无效");
+//        }
+//        try {
+//            //查看点赞信息
+//            LikeInfo selectOne = likeInfoService.getLikeInfo(likeInfo);
+//            if (selectOne == null){
+//                return ResultUtil.exceptionMap(2022,"未点赞");
+//            }else {
+//
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResultUtil.errorMap();
+//        }
+//    }
+//
 }

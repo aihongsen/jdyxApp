@@ -2,6 +2,7 @@ package com.jdyx.app.appvideo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jdyx.app.appvideo.mapper.VideoDisplayMapper;
+import com.jdyx.app.bean.LikeAndAttentionVo;
 import com.jdyx.app.bean.VideoDisplay;
 import com.jdyx.app.bean.VideoDisplayVo;
 import com.jdyx.app.service.VideoDisplayService;
@@ -65,8 +66,8 @@ public class VideoDisplayServiceImpl implements VideoDisplayService {
     }
 
     @Override
-    public VideoDisplay getVideoDisplayByVideoId(Integer videoId) {
-        return videoDisplayMapper.selectById(videoId);
+    public LikeAndAttentionVo getVideoDisplayByVideoId(Integer videoId) {
+        return videoDisplayMapper.getVideoDisplayByVideoId(videoId);
     }
 
     @Override

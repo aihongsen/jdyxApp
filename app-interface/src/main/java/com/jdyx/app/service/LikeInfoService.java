@@ -11,5 +11,5 @@ public interface LikeInfoService  {
 
     LikeInfo getLikeInfo(LikeInfo likeInfo);
 
-    LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer userId);
+    LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer followedId);
 }

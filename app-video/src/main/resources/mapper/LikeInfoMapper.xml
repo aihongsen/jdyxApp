@@ -2,11 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jdyx.app.appvideo.mapper.LikeInfoMapper">
     <select id="getLikeInfoAndAttentionInfo" resultType="com.jdyx.app.bean.LikeAndAttentionVo">
-        SELECT vd.`video_likes`,li.`is_like`,ai.`is_attention`,p.`name` jobName
+        SELECT p.`name` jobName,vd.`video_likes`,li.`is_like`,ai.`is_attention`,vd.*,ui.`image_src`,ui.`name`
         FROM `video_display` vd
         LEFT JOIN `like_info` li ON vd.`video_id`=li.`video_id`
         LEFT JOIN `attention_info` ai ON ai.`user_id`=vd.`user_id`
         LEFT JOIN `post` p ON p.`post_id`=vd.`job_id`
-        WHERE vd.`video_id`=#{videoId} and vd.`user_id`=#{userId}
+        LEFT JOIN `user_info` ui ON ui.id = vd.user_id
+        WHERE vd.`video_id`=#{videoId} and li.`followed_id`=#{followedId}
     </select>
 </mapper>

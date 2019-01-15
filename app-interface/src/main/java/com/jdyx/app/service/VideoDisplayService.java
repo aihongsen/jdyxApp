@@ -1,5 +1,6 @@
 package com.jdyx.app.service;
 
+import com.jdyx.app.bean.LikeAndAttentionVo;
 import com.jdyx.app.bean.Page;
 import com.jdyx.app.bean.VideoDisplay;
 import com.jdyx.app.bean.VideoDisplayVo;
@@ -32,7 +33,7 @@ public interface VideoDisplayService {
 
     VideoDisplay cancelLikeVideo(Integer videoId);
 
-    VideoDisplay getVideoDisplayByVideoId(Integer videoId);
+    LikeAndAttentionVo getVideoDisplayByVideoId(Integer videoId);
 
     int getVideoDisplayTotalByJobId(Integer jobId,Integer releaseType);
 

@@ -33,7 +33,7 @@ public class LikeInfoServiceImpl implements LikeInfoService {
     }
 
     @Override
-    public LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer userId) {
-        return likeInfoMapper.getLikeInfoAndAttentionInfo(videoId,userId);
+    public LikeAndAttentionVo getLikeInfoAndAttentionInfo(Integer videoId, Integer followedId) {
+        return likeInfoMapper.getLikeInfoAndAttentionInfo(videoId,followedId);
     }
 }

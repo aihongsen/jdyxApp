@@ -9,5 +9,5 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface LikeInfoMapper extends BaseMapper<LikeInfo>{
 
-    LikeAndAttentionVo getLikeInfoAndAttentionInfo(@Param("videoId") Integer videoId, @Param("userId") Integer userId);
+    LikeAndAttentionVo getLikeInfoAndAttentionInfo(@Param("videoId") Integer videoId, @Param("followedId") Integer followedId);
 }
