@@ -77,6 +77,7 @@ public class LikeAndAttentionVo implements Serializable{
     private Integer videoFollow;
 
     /**
+     *
      * 是否关注
      */
     private Integer isAttention;

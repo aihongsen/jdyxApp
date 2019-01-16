@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import redis.clients.jedis.JedisPool;
 
 import java.util.List;
 
@@ -25,24 +24,6 @@ public class PostController {
     @Autowired
     PostService postService;
 
-    @Autowired
-    JedisPool jedisPool;
-
-    @RequestMapping(value = "/getAllPost",method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation("获取所有岗位")
-    public Object getAllPost(){
-        try {
-            List<Post> allPost = postService.getAllPost();
-            Object json = JSON.toJSON(allPost);
-            log.info("StringJson : {}",json);
-            return ResultUtil.successMap(json);
-        }catch (Exception e){
-            log.error("",e);
-            return ResultUtil.errorMap();
-        }
-
-    }
 
     @RequestMapping(value = "/savePost",method = RequestMethod.POST)
     @ResponseBody

@@ -3,6 +3,8 @@ package com.jdyx.app.appvideo.controller;
 import com.alibaba.fastjson.JSON;
 import com.jdyx.app.bean.*;
 import com.jdyx.app.service.LikeInfoService;
+import com.jdyx.app.service.PositioningService;
+import com.jdyx.app.service.PostService;
 import com.jdyx.app.service.VideoDisplayService;
 import com.jdyx.app.util.Const;
 import com.jdyx.app.util.DistanceUtil;
@@ -409,7 +411,55 @@ public class VideoDisplayController {
         }
     }
 
+    @Autowired
+    PostService postService;
 
+    @RequestMapping(value = "/getCorePost",method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation("获取所有岗位")
+    public Object getCorePost(){
+        try {
+            List<Post> allPost = postService.getAllPost();
+            return ResultUtil.successMap(allPost);
+        }catch (Exception e){
+            log.error("",e);
+            return ResultUtil.errorMap();
+        }
+    }
+    @Autowired
+    PositioningService positioningService;
+
+    /**
+     *
+     0芍药居,39.9778107025,116.4361524582
+     1安贞门,39.9769803325,116.4059722424
+     2知春路,39.9764705954,116.3399469852
+     3知春里,39.9763143849,116.3286226988
+     * @return
+     */
+    @RequestMapping(value = "/savePositioning",method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value="保存定位")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "userId", value = "用户id", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "latitude", value = "经度", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType="query", name = "longitude", value = "纬度", required = false, dataType = "String")
+    })
+    public Object savePositioning(Integer userId, BigDecimal latitude,BigDecimal longitude){
+        if(userId==null ||userId ==0){
+            return  ResultUtil.exceptionMap(2019,"用户id无效");
+        }
+        if(latitude==null||longitude==null||BigDecimal.ZERO.equals(latitude)||BigDecimal.ZERO.equals(longitude)){
+            return  ResultUtil.exceptionMap(2019,"定位信息无效");
+        }
+        try {
+            positioningService.savePositioning(new Positioning(userId,latitude,longitude));
+            return ResultUtil.successMap("");
+        }catch (Exception e){
+            log.error("保存定位失败 ",e);
+            return ResultUtil.errorMap();
+        }
+    }
 //    /**
 //     * 取消视频点赞
 //     * @param likeInfo
