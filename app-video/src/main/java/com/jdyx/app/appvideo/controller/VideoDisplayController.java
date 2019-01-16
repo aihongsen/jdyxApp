@@ -43,7 +43,6 @@ public class VideoDisplayController {
     VideoDisplayService videoDisplayService;
 
     /**
-     *
      * @param longitude
      * @param latitude
      * @return
